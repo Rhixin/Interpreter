@@ -115,7 +115,7 @@ class Scanner {
                     //Check first through this function if the scanned text is a reserved word or an identifier
                     identifier();
                 } else {
-                    Bisaya.error(line, "Unexpected character.");
+                    Lox.error(line, "Unexpected character.");
                 }
                 break;
         }
@@ -134,7 +134,7 @@ class Scanner {
         }
 
         if(isAtEnd()){
-            Bisaya.error(line, "Unterminated string");
+            Lox.error(line, "Unterminated string");
             return;
         }
 
@@ -240,6 +240,7 @@ class Scanner {
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
     }
+
 
 
 
