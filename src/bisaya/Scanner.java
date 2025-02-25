@@ -9,7 +9,6 @@ import java.util.Map;
 
 import static bisaya.TokenType.*;
 
-
 class Scanner {
     //source is the raw source code
     private final String source;
@@ -60,7 +59,7 @@ class Scanner {
     }
 
 
-    //SCANNER MAIN FUNCTIONS HERE----------------
+    //SCANNER MAIN FUNCTIONS HERE-------------------------------------------------------------------
     List<Token> scanTokens() {
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
@@ -81,7 +80,7 @@ class Scanner {
             //SINGLE CHARACTERS
             //(, ), [, ], {, }
             //+ , /, *, %, =
-            //, .
+            //,
             //$, &
             case '(': addToken(LEFT_PAREN); break;
             case ')': addToken(RIGHT_PAREN); break;
@@ -95,7 +94,6 @@ class Scanner {
             case '%': addToken(MODULO); break;
             case '=': addToken(EQUAL); break;
             case ',': addToken(COMMA); break;
-            case '.': addToken(DOT); break;
             case '$': addToken(NEW_LINE); break;
             case '&': addToken(CONCAT); break;
 
@@ -120,21 +118,32 @@ class Scanner {
                 }
                 break;
 
-            //WHITE SPACES AND NEW LINE
+            //WHITE SPACE AND NEW LINE
             case ' ':
                 break;
             case '\n':
                 line++;
                 break;
 
-            //SINGLE QUOTE
-            // character or false literal
-            case 'z':
-                //character();
-                System.out.println("to be followed");
+            //CHARACTER LITERAL
+            case '\'':
+                character();
                 break;
+
+            //STRING, TRUE, FALSE LITERAL
+            case '"':
+                string();
+                break;
+
             default:
-                Bisaya.error(line, "Unexpected character.");
+                if (isDigit(c)) {
+                    number();
+                } else if (isAlpha(c)) {
+                    //Check first through this function if the scanned text is a reserved word or an identifier
+                    identifier();
+                } else {
+                    Bisaya.error(line, "Unexpected character.");
+                }
                 break;
         }
 
@@ -150,7 +159,96 @@ class Scanner {
     }
 
 
-    //HELPER FUNCTIONS HERE----------------------
+
+
+
+    //LITERALS FUNCTIONS HERE-----------------------------------------------------------------
+    private void character(){
+        if(peekNext() != '\''){
+            Bisaya.error(line, "Unterminated character");
+        } else {
+            char value = peek();
+            advance();
+            advance();
+            addToken(CHARACTER, value);
+        }
+    }
+
+    private void string(){
+        while(peek() != '"' && !isAtEnd()){
+            if(peek() == '\n'){
+                line++;
+            }
+
+            advance();
+        }
+
+        if(isAtEnd()){
+            Bisaya.error(line, "Unterminated string");
+            return;
+        }
+
+        //For the closing ""
+        advance();
+
+        //Trimming the string excluding the surrounding quotes
+        String value = source.substring(start + 1, current - 1);
+
+        //3 possible tokentypes only for words enclosed by ""
+        //STRING, TRUE, FALSE
+        TokenType type = STRING;
+        if(value.equals("OO")){
+            type = TRUE;
+        } else if (value.equals("DILI")){
+            type = FALSE;
+        }
+
+        addToken(type, value);
+    }
+
+    private void number() {
+        while(isDigit(peek())){
+            advance();
+        }
+
+        if(peek() == '.' && isDigit(peekNext()) ){
+            //Consume now the '.'. Safe to move forward
+            advance();
+
+            //Consume remaing decimal digits
+            while(isDigit(peek())){
+                advance();
+            }
+        }
+
+        //SUGGESTION: Implement double parsing yourself but it is time consuming
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
+
+    //For identifiers (myVariable, averagevariable) and reserved words (DILI, OO, SAMTANG)
+    private void identifier() {
+        while (isAlphaNumeric(peek())){
+            advance();
+        }
+
+        String text = source.substring(start, current);
+
+        //Check from the reserved keywords if the scanned text is found there
+        TokenType type = keywords.get(text);
+        if (type == null) {
+            type = IDENTIFIER;
+        }
+
+        addToken(type);
+    }
+
+
+
+
+
+
+
+    //HELPER FUNCTIONS HERE---------------------------------------------------------------------
     private boolean isAtEnd() {
         return current >= source.length();
     }
@@ -176,5 +274,19 @@ class Scanner {
     private char peekNext() {
         if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private boolean isAlpha(char c) {
+        return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
+    }
+
+    private boolean isAlphaNumeric(char c) {
+        return isAlpha(c) || isDigit(c);
     }
 }

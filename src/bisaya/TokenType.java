@@ -6,8 +6,8 @@ enum TokenType {
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_CURLY, RIGHT_CURLY,
     //+ , /, *, %, =
     PLUS, SLASH, STAR, MODULO, EQUAL,
-    //, .
-    COMMA,DOT,
+    //,
+    COMMA,
     //$, &
     NEW_LINE, CONCAT,
 
@@ -24,6 +24,10 @@ enum TokenType {
 
     // Keywords.---------------------------------------------------------------------
     START, END, DECLARE, PRINT, BLOCK, FOR, SCAN, AND, OR, TRUE, NOT, FALSE, IF, ELSE_IF, ELSE,
+
+
+    //??------------------------------------------------------------------------------
+    STRING,
 
     EOF
 }

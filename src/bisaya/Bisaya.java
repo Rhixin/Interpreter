@@ -51,17 +51,14 @@ public class Bisaya {
             System.exit(65);
         }
 
-//        Scanner scanner = new Scanner(source);
-//        List<Token> tokens = scanner.scanTokens();
-//
-//        // For now, just print the tokens.
-//        for (Token token : tokens) {
-//            System.out.println(token);
-//        }
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = scanner.scanTokens();
 
-        System.out.println("To be followed");
+        // For now, just print the tokens.
+        for (Token token : tokens) {
+            System.out.println(token);
+        }
     }
-
 
     //Suggestion:
     //Create interface ErrorReporter to achieve different implementations of error reporting
