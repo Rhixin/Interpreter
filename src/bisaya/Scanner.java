@@ -1,7 +1,14 @@
 package bisaya;
 
+import lox.Lox;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static bisaya.TokenType.*;
+
 
 class Scanner {
     //source is the raw source code
@@ -10,13 +17,164 @@ class Scanner {
     //our scanner must generate list of tokens
     private final List<Token> tokens = new ArrayList<>();
 
+    //Store reserved keywords here
+    private static final Map<String, TokenType> keywords;
+    static {
+        keywords = new HashMap<>();
+
+        keywords.put("SUGOD",  START);
+        keywords.put("KATAPUSAN",  END);
+
+        keywords.put("UG",    AND);
+        keywords.put("O",     OR);
+        keywords.put("BALI",  NOT);
+
+        keywords.put("KUNG",     IF);
+        keywords.put("KUNG WALA",   ELSE_IF);
+        keywords.put("KUNG DILI",    ELSE);
+
+        keywords.put("ALANG SA",    FOR);
+
+        keywords.put("OO",   TRUE);
+        keywords.put("DILI",  FALSE);
+
+        keywords.put("MUGNA",    DECLARE);
+        keywords.put("IPAKITA",  PRINT);
+
+        keywords.put("NUMERO",  NUMBER);
+        keywords.put("LETRA",  CHARACTER);
+        keywords.put("TINUOD",  BOOLEAN);
+        keywords.put("TIPIK",  DOUBLE);
+
+        keywords.put("PUNDOK",  BLOCK);
+        keywords.put("DAWAT",  SCAN);
+    }
+
     //helpers in scanning
     private int start = 0;
     private int current = 0;
     private int line = 1;
 
-
     Scanner(String source){
         this.source = source;
+    }
+
+
+    //SCANNER MAIN FUNCTIONS HERE----------------
+    List<Token> scanTokens() {
+        while (!isAtEnd()) {
+            // We are at the beginning of the next lexeme.
+            start = current;
+            scanToken();
+        }
+
+        //Appends one final “end of file” token
+        //this is important ensuring the parses knows the end of the input
+        tokens.add(new Token(EOF, "", null, line));
+        return tokens;
+    }
+
+    private void scanToken() {
+        char c = advance();
+
+        switch (c){
+            //SINGLE CHARACTERS
+            //(, ), [, ], {, }
+            //+ , /, *, %, =
+            //, .
+            //$, &
+            case '(': addToken(LEFT_PAREN); break;
+            case ')': addToken(RIGHT_PAREN); break;
+            case '{': addToken(LEFT_CURLY); break;
+            case '}': addToken(RIGHT_CURLY); break;
+            case '[': addToken(LEFT_BRACE); break;
+            case ']': addToken(RIGHT_BRACE); break;
+            case '+': addToken(PLUS); break;
+            case '*': addToken(STAR); break;
+            case '/': addToken(SLASH); break;
+            case '%': addToken(MODULO); break;
+            case '=': addToken(EQUAL); break;
+            case ',': addToken(COMMA); break;
+            case '.': addToken(DOT); break;
+            case '$': addToken(NEW_LINE); break;
+            case '&': addToken(CONCAT); break;
+
+            //ONE OR MORE CHARACTERS
+            //>, >=
+            //<, <=, <>
+            //-, --
+            case '>':
+                addToken(match('=') ? GREATER_EQUAL : GREATER);
+                break;
+            case '<':
+                addToken(match('=') ? LESSER_EQUAL : match('>') ? NOT_EQUAL : LESSER);
+                break;
+            case '-':
+                if(match('-')){
+                    while(peek() != '\n' && !isAtEnd()){
+                        advance();
+                    }
+
+                } else {
+                    addToken(MINUS);
+                }
+                break;
+
+            //WHITE SPACES AND NEW LINE
+            case ' ':
+                break;
+            case '\n':
+                line++;
+                break;
+
+            //SINGLE QUOTE
+            // character or false literal
+            case 'z':
+                //character();
+                System.out.println("to be followed");
+                break;
+            default:
+                Bisaya.error(line, "Unexpected character.");
+                break;
+        }
+
+    }
+
+    private void addToken(TokenType type){
+        addToken(type, null);
+    }
+
+    private void addToken(TokenType type, Object literal){
+        String lexeme = source.substring(start, current);
+        tokens.add(new Token(type, lexeme,literal,line));
+    }
+
+
+    //HELPER FUNCTIONS HERE----------------------
+    private boolean isAtEnd() {
+        return current >= source.length();
+    }
+
+    private char advance() {
+        return source.charAt(current++);
+    }
+
+    private boolean match(char expected){
+        if(isAtEnd() || source.charAt(current) != expected){
+            return false;
+        }
+
+        current++;
+        return true;
+    }
+
+    private char peek() {
+        if (isAtEnd()) return '\0';
+        return source.charAt(current);
+    }
+
+    private char peekNext() {
+        if (current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
     }
 }

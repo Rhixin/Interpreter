@@ -1,4 +1,4 @@
-package interpreter;
+package lox;
 
 class Token {
     //Specifies the category of the token (e.g., IDENTIFIER, NUMBER, PLUS, EOF). Implemented as ENUM
@@ -9,7 +9,6 @@ class Token {
     final Object literal;
     //Tracks the line number where the token appears in the source code.
     final int line;
-
 
     Token(TokenType type, String lexeme, Object literal, int line) {
         this.type = type;

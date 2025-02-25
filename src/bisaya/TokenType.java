@@ -2,36 +2,28 @@ package bisaya;
 
 enum TokenType {
     //Single character tokens--------------------------------------------------------
-    //(, ), [, ]
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
+    //(, ), [, ], {, }
+    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_CURLY, RIGHT_CURLY,
     //+ , /, *, %, =
     PLUS, SLASH, STAR, MODULO, EQUAL,
     //, .
-    COMMA, DOT,
+    COMMA,DOT,
     //$, &
-    NEXT_LINE, CONCAT,
-    //or
-    O,
+    NEW_LINE, CONCAT,
 
     // One or two character tokens OR misleading tokens.-----------------------------
-    //<, <=
+    //>, >=
     GREATER, GREATER_EQUAL,
     //<, <=, <>
-    LESS, LESS_EQUAL, NOT_EQUAL,
+    LESSER, LESSER_EQUAL, NOT_EQUAL,
     //-, --
     MINUS, COMMENT,
-    //if, else if, else
-    KUNG, KUNG_DILI, KUNG_WALA,
 
     // Literals.--------------------------------------------------------------------
-    // variable name, number, double, string??, character, boolean
-    IDENTIFIER, NUMERO, TIPIK, STRING, LETRA, TINUOD,
+    IDENTIFIER, NUMBER, DOUBLE, CHARACTER, BOOLEAN,
 
     // Keywords.---------------------------------------------------------------------
-    //and, True -> "OO", !, False -> "DILI"
-    UG, OO, DILI_OPERATOR, DILI_LITERAL,
-    //start, end, var, print, block statement, for, uninitialized variable
-    SUGOD, KATAPUSAN, MUGNA, IPAKITA, PUNDOK, ALANG_SA, DAWAT,
+    START, END, DECLARE, PRINT, BLOCK, FOR, SCAN, AND, OR, TRUE, NOT, FALSE, IF, ELSE_IF, ELSE,
 
     EOF
 }

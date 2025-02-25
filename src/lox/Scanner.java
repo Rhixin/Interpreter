@@ -1,11 +1,11 @@
-package interpreter;
+package lox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static interpreter.TokenType.*;
+import static lox.TokenType.*;
 
 class Scanner {
     //source is the raw source code
