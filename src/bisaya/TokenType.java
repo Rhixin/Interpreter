@@ -17,7 +17,7 @@ enum TokenType {
     //<, <=, <>
     LESSER, LESSER_EQUAL, NOT_EQUAL,
     //-, --
-    MINUS, COMMENT,
+    MINUS,
 
     // Literals.--------------------------------------------------------------------
     IDENTIFIER, NUMBER, DOUBLE, CHARACTER, BOOLEAN,
