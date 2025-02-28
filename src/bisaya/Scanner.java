@@ -122,6 +122,10 @@ class Scanner {
             //WHITE SPACE AND NEW LINE
             case ' ':
                 break;
+            case '\t':
+                break;
+            case '\r':
+                break;
             case '\n':
                 line++;
                 break;
@@ -145,6 +149,7 @@ class Scanner {
                     identifier();
                 } else {
                     Bisaya.error(line, "Unexpected character.");
+//                    Bisaya.error(line, "ASCII of the character: " + (int) c);
                 }
                 break;
         }
@@ -290,5 +295,12 @@ class Scanner {
 
     private boolean isAlphaNumeric(char c) {
         return isAlpha(c) || isDigit(c);
+    }
+
+    public void printTokens(){
+        for(Token token : tokens){
+            System.out.println(token);
+            System.out.println();
+        }
     }
 }
