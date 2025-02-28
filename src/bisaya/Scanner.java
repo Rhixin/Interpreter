@@ -146,6 +146,7 @@ class Scanner {
                 } else if (isAlpha(c)) {
                     //Check first through this function if the scanned text is a reserved word or an identifier
                     //TODO: SOME RESERVED WORDS ARE SEPARATED BY SPACE. EX. "KUNG WALA"
+
                     identifier();
                 } else {
                     Bisaya.error(line, "Unexpected character.");
