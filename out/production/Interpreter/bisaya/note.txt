@@ -1,0 +1,34 @@
+1. Scanning
+    TODO: Reserved Keywords are separated by space
+
+2. Preparing things before parsing
+    - Expressions
+    - Statements
+    - TODO:Used Visitor Design Pattern (wa pa kayko kasabot ani do)
+    - AST Printer to print expressions
+
+
+    GRAMMAR RULES
+
+    expression     → equality ;
+    equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+    comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+    term           → factor ( ( "-" | "+" ) factor )* ;
+    factor         → unary ( ( "/" | "*" ) unary )* ;
+    unary          → ( "!" | "-" ) unary
+                   | primary ;
+    primary        → NUMBER | STRING | "true" | "false" | "nil"
+                   | "(" expression ")" ;
+
+
+
+    GRAMMAR PRECEDENCE
+                                          CONSTRUCTION OF EXPRESSIONS             PARSING OF EXPRESSIONS
+    Equality            ==, !=                       HIGHER                                LOWER
+    Comparison          >, <, >=, <=                   |                                     |
+    Addition            +, -                           |                                     |
+    Multiplication      /, *                           |                                     |
+    Unary               !, -                         LOWER                                 HIGHER
+
+3. Parsing
+    TODO:
