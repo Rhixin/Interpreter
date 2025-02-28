@@ -90,15 +90,18 @@ class Scanner {
             case '*': addToken(STAR); break;
             case '/': addToken(SLASH); break;
             case '%': addToken(MODULO); break;
-            case '=': addToken(EQUAL); break;
             case ',': addToken(COMMA); break;
             case '$': addToken(NEW_LINE); break;
             case '&': addToken(CONCAT); break;
 
             //ONE OR MORE CHARACTERS
+            //=, ==
             //>, >=
             //<, <=, <>
             //-, --
+            case '=':
+                addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+                break;
             case '>':
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
                 break;

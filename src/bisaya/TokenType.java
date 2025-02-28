@@ -14,8 +14,8 @@ enum TokenType {
     // One or two character tokens OR misleading tokens.-----------------------------
     //>, >=
     GREATER, GREATER_EQUAL,
-    //<, <=, <>
-    LESSER, LESSER_EQUAL, NOT_EQUAL,
+    //<, <=, <>, ==
+    LESSER, LESSER_EQUAL, NOT_EQUAL, EQUAL_EQUAL,
     //-, --
     MINUS,
 
