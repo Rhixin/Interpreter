@@ -70,7 +70,6 @@ abstract class Stmt {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitPrintStmt(this);
         }
-
     }
 
     static class Var extends Stmt {

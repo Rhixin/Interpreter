@@ -3,29 +3,36 @@ package bisaya;
 
 /*
 
-expression     → literal
-               | unary
-               | binary
-               | grouping ;
+Expression
 
-literal        → NUMBER | STRING | "true" | "false" | "nil" ;
-grouping       → "(" expression ")" ;
-unary          → ( "-" | "!" ) expression ;
-binary         → expression operator expression ;
-operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
-               | "+"  | "-"  | "*" | "/" ;
+    Assign
+        Token name, Expression value
+        x = 1
 
-/*
+    Unary
+        Token operator, Expression right
+        -x
 
-expression     → equality ;
-equality       → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-term           → factor ( ( "-" | "+" ) factor )* ;
-factor         → unary ( ( "/" | "*" ) unary )* ;
-unary          → ( "!" | "-" ) unary
-               | primary ;
-primary        → NUMBER | STRING | "true" | "false" | "nil"
-               | "(" expression ")" ;
+    Binary
+        Expression left, Token operator, Expression right
+        x + y
+
+    Grouping
+        Expression expr
+        (x + y + z)
+
+    Literal
+        Token value
+        123, "hello", true
+
+    Logical
+        Expression left, Token operator, Expression right
+        x && y
+
+    Variable
+        Token name
+        x
+
 */
 
 abstract class Expr {
@@ -58,6 +65,8 @@ abstract class Expr {
     }
 
     static class Unary extends Expr {
+        final Token operator;
+        final Expr right;
         Unary(Token operator, Expr right) {
             this.operator = operator;
             this.right = right;
@@ -68,8 +77,6 @@ abstract class Expr {
             return visitor.visitUnaryExpr(this);
         }
 
-        final Token operator;
-        final Expr right;
     }
 
     static class Binary extends Expr {
@@ -133,7 +140,6 @@ abstract class Expr {
     }
 
     static class Variable extends Expr {
-
         final Token name;
 
         Variable(Token name) {
