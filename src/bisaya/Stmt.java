@@ -5,12 +5,11 @@ import java.util.List;
 abstract class Stmt {
     interface Visitor<R> {
         R visitBlockStmt(Block stmt);
-        R visitClassStmt(Class stmt);
         R visitExpressionStmt(Expression stmt);
         R visitIfStmt(If stmt);
         R visitPrintStmt(Print stmt);
         R visitVarStmt(Var stmt);
-        R visitWhileStmt(While stmt);
+        R visitForStmt(While stmt);
     }
 
     abstract <R> R accept(Visitor<R> visitor);
@@ -98,7 +97,7 @@ abstract class Stmt {
 
         @Override
         <R> R accept(Visitor<R> visitor) {
-            return visitor.visitWhileStmt(this);
+            return visitor.visitForStmt(this);
         }
     }
 
