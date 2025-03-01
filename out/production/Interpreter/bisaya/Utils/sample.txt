@@ -1,3 +1,6 @@
 SUGOD
     MUGNA NUMERO num = 10
+    KUNG
+    KUNG DILI
+    _amigo
 KATAPUSAN
