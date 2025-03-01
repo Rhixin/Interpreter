@@ -147,10 +147,12 @@ class Scanner {
                     //Check first through this function if the scanned text is a reserved word or an identifier
                     //TODO: SOME RESERVED WORDS ARE SEPARATED BY SPACE. EX. "KUNG WALA"
 
+
+
                     identifier();
                 } else {
                     Bisaya.error(line, "Unexpected character.");
-//                    Bisaya.error(line, "ASCII of the character: " + (int) c);
+                    //Bisaya.error(line, "ASCII of the character: " + (int) c);
                 }
                 break;
         }
@@ -227,10 +229,13 @@ class Scanner {
             while(isDigit(peek())){
                 advance();
             }
-        }
 
-        //SUGGESTION: Implement double parsing yourself but it is time consuming
-        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+            //SUGGESTION: Implement double parsing yourself but it is time consuming
+            addToken(DOUBLE, Double.parseDouble(source.substring(start, current)));
+        }else{
+            //meaning number sha di double
+            addToken(NUMBER, Integer.parseInt(source.substring(start, current)));
+        }
     }
 
     //For identifiers (myVariable, averagevariable) and reserved words (DILI, OO, SAMTANG)
@@ -249,6 +254,8 @@ class Scanner {
 
         addToken(type);
     }
+
+
 
 
 
