@@ -146,10 +146,10 @@ class Scanner {
                 } else if (isAlpha(c)) {
                     //Check first through this function if the scanned text is a reserved word or an identifier
                     //TODO: SOME RESERVED WORDS ARE SEPARATED BY SPACE. EX. "KUNG WALA"
-                    identifier();
+                    identifierOrReserved();
                 } else {
                     Bisaya.error(line, "Unexpected character.");
-//                    Bisaya.error(line, "ASCII of the character: " + (int) c);
+                    //Bisaya.error(line, "ASCII of the character: " + (int) c);
                 }
                 break;
         }
@@ -226,14 +226,17 @@ class Scanner {
             while(isDigit(peek())){
                 advance();
             }
-        }
 
-        //SUGGESTION: Implement double parsing yourself but it is time consuming
-        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+            //SUGGESTION: Implement double parsing yourself but it is time consuming
+            addToken(DOUBLE, Double.parseDouble(source.substring(start, current)));
+        }else{
+            //meaning number sha di double
+            addToken(NUMBER, Integer.parseInt(source.substring(start, current)));
+        }
     }
 
-    //For identifiers (myVariable, averagevariable) and reserved words (DILI, OO, SAMTANG)
-    private void identifier() {
+    //For identifiers (myVariable, averagevariable)c and reserved words (DILI, OO, SAMTANG)
+    private void identifierOrReserved() {
         while (isAlphaNumeric(peek())){
             advance();
         }
@@ -243,10 +246,40 @@ class Scanner {
         //Check from the reserved keywords if the scanned text is found there
         TokenType type = keywords.get(text);
         if (type == null) {
-            type = IDENTIFIER;
-        }
+            type = IDENTIFIER; //variable name
+            addToken(type);
+        }else{
+            //now we have to check if naay sumpay pa ang keyword (e.g. KUNG DILI)
+            //at this point, naa tas isa ka space - advance()
 
-        addToken(type);
+            if(!isAtEnd()){
+                advance();
+            }else{
+                return;
+            }
+
+            //check sa nato og valid keyword sad ba ang next token
+            //create tag temp variables to preserve the integrity of the algorithm
+            int preservedCurrValue = current;
+            int tempStart = current;
+
+            while (isAlphaNumeric(peek())){
+                advance();
+            }
+
+            String potentialSecondKeyword = source.substring(tempStart, current);
+
+            //now concat the two keywords
+            TokenType type2 = keywords.get(text + " " + potentialSecondKeyword);
+            if(type2 == null){ //meaning the second word is not a valid second keyword
+                // we revert the values of the marker variables to their original values
+                current = preservedCurrValue;
+                addToken(type);
+            }else{
+                // meaning valid sha
+                addToken(type2);
+            }
+        }
     }
 
 
