@@ -285,11 +285,6 @@ class Scanner {
 
 
 
-
-
-
-
-
     //HELPER FUNCTIONS HERE---------------------------------------------------------------------
     private boolean isAtEnd() {
         return current >= source.length();
