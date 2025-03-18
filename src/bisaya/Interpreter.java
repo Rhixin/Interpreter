@@ -1,5 +1,7 @@
 package bisaya;
 
+import com.sun.jdi.DoubleValue;
+
 public class Interpreter implements Expr.Visitor<Object>{
 
     void interpret(Expr expression){
@@ -10,6 +12,11 @@ public class Interpreter implements Expr.Visitor<Object>{
             Bisaya.runtimeError(error);
         }
     }
+
+    private Object evaluate(Expr expr) {
+        return expr.accept(this);
+    }
+
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         return null;
@@ -17,12 +24,12 @@ public class Interpreter implements Expr.Visitor<Object>{
 
     @Override
     public Object visitUnaryExpr(Expr.Unary expr) {
-        Object right = expr.right;
+        Object right = evaluate(expr.right);
 
         switch (expr.operator.type){
             case MINUS:
                 checkNumberOperand(expr.operator, right);
-                return -(double)right;
+                return -(toDouble(right));
             case NOT:
                 return !isTruthy(right);
         }
@@ -33,45 +40,54 @@ public class Interpreter implements Expr.Visitor<Object>{
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
+
+
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
 
         switch (expr.operator.type) {
             case MINUS:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left - (double) right;
+                return toDouble(left) - toDouble(right);
             case PLUS:
-                if (left instanceof Double && right instanceof Double) {
-                    return (double)left + (double)right;
+                if (left instanceof Number && right instanceof Number) {
+                    return toDouble(left) + toDouble(right);
                 }
 
                 if (left instanceof String && right instanceof String) {
                     return (String)left + (String)right;
                 }
 
+                //CONCAT STRING AND NUMBER
+                if(left instanceof String && right instanceof Number){
+                    return left + right.toString();
+                } else if (left instanceof Number && right instanceof String){
+                    return left.toString() + right;
+                }
+
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left / (double) right;
+                return toDouble(left) / toDouble(right);
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
-                return (double) left * (double) right;
+                return toDouble(left) * toDouble(right);
             case NOT_EQUAL:
                 return !isEqual(left, right);
             case EQUAL_EQUAL:
                 return isEqual(left, right);
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left > (double)right;
+                return toDouble(left) > toDouble(right);
             case GREATER_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left >= (double)right;
+                return toDouble(left) >= toDouble(right);
             case LESSER:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left < (double)right;
+                return toDouble(left) < toDouble(right);
             case LESSER_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
-                return (double)left <= (double)right;
+                return toDouble(left) <= toDouble(right);
         }
 
         //Unreachable
@@ -98,9 +114,6 @@ public class Interpreter implements Expr.Visitor<Object>{
         return null;
     }
 
-    private Object evaluate(Expr expr) {
-        return expr.accept(this);
-    }
 
     //HELPER FUNCTIONS----------------------------------------------------------------------------------
     private boolean isTruthy(Object object){
@@ -120,19 +133,22 @@ public class Interpreter implements Expr.Visitor<Object>{
     }
 
     private void checkNumberOperand(Token operator, Object operand){
-        if(operand instanceof Double) return;
+        if(operand instanceof Number){
+            return;
+        }
 
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
     private void checkNumberOperands(Token operator, Object left, Object right) {
-        if (left instanceof Double && right instanceof Double) return;
+        if (left instanceof Number && right instanceof Number) return;
+
 
         throw new RuntimeError(operator, "Operands must be numbers.");
     }
 
     private String stringify(Object object) {
-        if (object == null) return "nil";
+        if (object == null) return "null";
 
         if (object instanceof Double) {
             String text = object.toString();
@@ -143,5 +159,9 @@ public class Interpreter implements Expr.Visitor<Object>{
         }
 
         return object.toString();
+    }
+
+    private Double toDouble(Object number){
+        return ((Number) number).doubleValue();
     }
 }

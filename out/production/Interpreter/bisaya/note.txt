@@ -1,5 +1,6 @@
 1. Scanning
     TODO: Reserved Keywords are separated by space
+    TODO: BALI00 kay gi tokenized to identifier
 
 2. Preparing things before parsing
     - Expressions
@@ -31,4 +32,10 @@
     Unary               !, -                         LOWER                                 HIGHER
 
 3. Parsing
-    TODO:
+    TODO: LOGICAL OPERATORS (OR, AND)
+
+
+
+4. Evaluation
+    TODO: LOGICAL OPERATORS (OR, AND)
+

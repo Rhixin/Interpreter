@@ -17,24 +17,29 @@ public class Main {
         }
 
         scScanner = new Scanner(source);
-        //scScanner.scanTokens();
-        //scScanner.printTokens();
-
-        Expr expression1 = new Expr.Binary(
-                new Expr.Binary(
-                        new Expr.Literal(10),
-                        new Token(TokenType.PLUS, "+", null, 1),
-                        new Expr.Literal(20)
-                ),
-                new Token(TokenType.STAR, "*", null, 1),
-                new Expr.Unary(
-                        new Token(TokenType.MINUS, "-", null, 1),
-                        new Expr.Literal(5)
-                )
-        );
-
-        System.out.println(new AstPrinter().print(expression1));
 
 
+        Parser parser = new Parser(scScanner.scanTokens());
+        scScanner.printTokens();
+
+        Expr expression = parser.parse();
+
+//        Expr expression = new Expr.Binary(
+//                new Expr.Binary(
+//                        new Expr.Literal((double)10),
+//                        new Token(TokenType.PLUS, "+", null, 1),
+//                        new Expr.Literal((double)20)
+//                ),
+//                new Token(TokenType.STAR, "*", null, 1),
+//                new Expr.Unary(
+//                        new Token(TokenType.MINUS, "-", null, 1),
+//                        new Expr.Literal((double)5)
+//                )
+//        );
+
+        System.out.println(new AstPrinter().print(expression));
+
+        Interpreter interpreter = new Interpreter();
+        interpreter.interpret(expression);
     }
 }

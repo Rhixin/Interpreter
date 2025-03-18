@@ -1,6 +1,1 @@
-SUGOD
-    MUGNA NUMERO num = 10
-    KUNG
-    KUNG DILI
-    _amigo
-KATAPUSAN
+24 * (5 - 7) + " hello "

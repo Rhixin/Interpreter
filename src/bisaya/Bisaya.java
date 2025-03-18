@@ -57,17 +57,19 @@ public class Bisaya {
             System.exit(65);
         }
 
-        //TOKENIZATION
+        //1. TOKENIZATION ***********************************************
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
         Parser parser = new Parser(tokens);
+
+        //2. PARSING ****************************************************
         Expr expression = parser.parse();
 
         // Stop if there was a syntax error.
         if (hadError) return;
 
-        //PARSING
+        //3. EVALUATION *************************************************
         //print expression before parsing. just to check lang
         System.out.println(new AstPrinter().print(expression));
         interpreter.interpret(expression);

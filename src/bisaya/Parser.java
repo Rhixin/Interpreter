@@ -33,6 +33,9 @@ class Parser {
     primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
     */
 
+
+    //TODO: LOGICAL OPERATORS (OR, AND)
+
     private Expr expression(){
         return equality();
     }
