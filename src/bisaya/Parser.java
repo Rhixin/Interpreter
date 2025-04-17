@@ -127,7 +127,7 @@ class Parser {
         return false;
     }
 
-    private boolean check(TokenType type) {
+    private boolean check(TokenType  type) {
         if (isAtEnd()) return false;
         return peek().type == type;
     }
@@ -151,6 +151,7 @@ class Parser {
 
     //Same like match method but it can only advance if it is the expected token type
     private Token consume(TokenType type, String message) {
+        //check if the current token is a right paren
         if (check(type)) return advance();
 
         throw error(peek(), message);
