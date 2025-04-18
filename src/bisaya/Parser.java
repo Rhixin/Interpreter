@@ -24,7 +24,9 @@ class Parser {
     //GRAMMAR RULES HERE-------------------------------------------------------------------------
 
     /*
-    expression     → equality ;
+    expression     → or ;
+    or             → and ( "or" and )* ;
+    and            → equality ( "and" equality )* ;
     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
     comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
     term           → factor ( ( "-" | "+" ) factor )* ;
@@ -37,10 +39,38 @@ class Parser {
     //TODO: LOGICAL OPERATORS (OR, AND)
 
     private Expr expression(){
-        return equality();
+        System.out.println("In expression() - current token: " + peek());
+        return or();
+    }
+
+    private Expr or(){
+        System.out.println("In or() - current token: " + peek());
+        Expr expr = and();
+
+        while(match(OR)){
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr and(){
+        System.out.println("In and() - current token: " + peek());
+        Expr expr = equality();
+
+        while(match(AND)){
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
     }
 
     private Expr equality(){
+        System.out.println("In equality() - current token: " + peek());
         Expr expr = comparison();
 
         while(match(NOT_EQUAL, EQUAL_EQUAL)){
@@ -53,6 +83,7 @@ class Parser {
     }
 
     private Expr comparison(){
+        System.out.println("In comparison() - current token: " + peek());
         Expr expr = term();
 
         while(match(GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL)){
@@ -65,6 +96,7 @@ class Parser {
     }
 
     private Expr term(){
+        System.out.println("In term() - current token: " + peek());
         Expr expr = factor();
 
         while(match(MINUS, PLUS)){
@@ -77,6 +109,7 @@ class Parser {
     }
 
     private Expr factor() {
+        System.out.println("In factor() - current token: " + peek());
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
@@ -89,6 +122,7 @@ class Parser {
     }
 
     private Expr unary() {
+        System.out.println("In unary() - current token: " + peek());
         if (match(NOT, MINUS)) {
             Token operator = previous();
             Expr right = unary();
@@ -99,6 +133,7 @@ class Parser {
     }
 
     private Expr primary() {
+        System.out.println("In primary() - current token: " + peek());
         if (match(FALSE)) {
             return new Expr.Literal(false);
         } else if (match(TRUE)) {

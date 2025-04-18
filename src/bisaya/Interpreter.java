@@ -1,7 +1,5 @@
 package bisaya;
 
-import com.sun.jdi.DoubleValue;
-
 public class Interpreter implements Expr.Visitor<Object>{
 
     void interpret(Expr expression){
@@ -50,6 +48,7 @@ public class Interpreter implements Expr.Visitor<Object>{
                 checkNumberOperands(expr.operator, left, right);
                 return toDouble(left) - toDouble(right);
             case PLUS:
+                //TODO: Implement concat when either one of the operand is a string
                 if (left instanceof Number && right instanceof Number) {
                     return toDouble(left) + toDouble(right);
                 }
@@ -67,6 +66,7 @@ public class Interpreter implements Expr.Visitor<Object>{
 
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
             case SLASH:
+                //TODO: Implement division by zero
                 checkNumberOperands(expr.operator, left, right);
                 return toDouble(left) / toDouble(right);
             case STAR:
@@ -106,7 +106,16 @@ public class Interpreter implements Expr.Visitor<Object>{
 
     @Override
     public Object visitLogicalExpr(Expr.Logical expr) {
-        return null;
+        Object left = evaluate(expr.left);
+
+        if(expr.operator.type == TokenType.OR) {
+            //no need to evaluate the right
+            if(isTruthy(left)) return left;
+        }else if(expr.operator.type == TokenType.AND){
+            if(!isTruthy(left)) return left;
+        }
+
+        return evaluate(expr.right);
     }
 
     @Override
@@ -163,5 +172,9 @@ public class Interpreter implements Expr.Visitor<Object>{
 
     private Double toDouble(Object number){
         return ((Number) number).doubleValue();
+    }
+
+    private Boolean toBoolean(Object bool){
+        return (Boolean) bool;
     }
 }
