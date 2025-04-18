@@ -3,6 +3,7 @@ package bisaya;
 import bisaya.Utils.SourceCodeReader;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -22,7 +23,8 @@ public class Main {
         Parser parser = new Parser(scScanner.scanTokens());
         scScanner.printTokens();
 
-        Expr expression = parser.parse();
+//        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
 //        Expr expression = new Expr.Binary(
 //                new Expr.Binary(
@@ -37,9 +39,9 @@ public class Main {
 //                )
 //        );
 
-        System.out.println(new AstPrinter().print(expression));
+//        System.out.println(new AstPrinter().print(statements));
 
         Interpreter interpreter = new Interpreter();
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
     }
 }

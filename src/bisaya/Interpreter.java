@@ -1,23 +1,48 @@
 package bisaya;
 
-public class Interpreter implements Expr.Visitor<Object>{
+import java.util.List;
 
-    void interpret(Expr expression){
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
+    private Environment environment = new Environment();
+
+    void interpret(List<Stmt> statements){
         try{
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+//            Object value = evaluate(expression);
+//            System.out.println(stringify(value));
+            for(Stmt statement : statements){
+                execute(statement);
+            }
         } catch (RuntimeError error){
             Bisaya.runtimeError(error);
         }
+    }
+
+    private void execute(Stmt stmt) {
+        stmt.accept(this);
     }
 
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
 
+    void executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment; // save current environment
+        try {
+            this.environment = environment;
+
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            this.environment = previous; // restore the environment
+        }
+    }
+
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
-        return null;
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
     }
 
     @Override
@@ -120,6 +145,48 @@ public class Interpreter implements Expr.Visitor<Object>{
 
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
+        return environment.get(expr.name);
+    }
+
+    //Statement overrides ------------------------------------------------------------------------------
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
+
+
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+        }
+
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+        public Void visitBlockStmt(Stmt.Block stmt) {
+            executeBlock(stmt.statements, new Environment(environment));
+            return null;
+        }
+
+    @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        return null;
+    }
+
+    @Override
+    public Void visitForStmt(Stmt.While stmt) {
         return null;
     }
 
@@ -172,9 +239,5 @@ public class Interpreter implements Expr.Visitor<Object>{
 
     private Double toDouble(Object number){
         return ((Number) number).doubleValue();
-    }
-
-    private Boolean toBoolean(Object bool){
-        return (Boolean) bool;
     }
 }

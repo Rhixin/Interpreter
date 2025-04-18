@@ -64,15 +64,17 @@ public class Bisaya {
         Parser parser = new Parser(tokens);
 
         //2. PARSING ****************************************************
-        Expr expression = parser.parse();
+//        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (hadError) return;
 
         //3. EVALUATION *************************************************
         //print expression before parsing. just to check lang
-        System.out.println(new AstPrinter().print(expression));
-        interpreter.interpret(expression);
+//        System.out.println(new AstPrinter().print(statements));
+
+        interpreter.interpret(statements);
     }
 
     //Suggestion:
