@@ -30,4 +30,24 @@ enum TokenType {
     STRING,
 
     EOF
-}
+
+    //TODO:
+//    public enum TokenType {
+//        NUMBER("number"),
+//        DOUBLE("double"),
+//        STRING("string"),
+//        BOOLEAN("boolean");
+//
+//        private final String displayName;
+//
+//        TokenType(String displayName) {
+//            this.displayName = displayName;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return displayName;
+//        }
+//    }
+
+    }

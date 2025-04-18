@@ -1,5 +1,6 @@
 package bisaya;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,31 +14,164 @@ class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-        try {
-            return expression();
-        } catch (ParseError error) {
-            return null;
+//    Expr parse() {
+//        try {
+//            return expression();
+//        } catch (ParseError error) {
+//            return null;
+//        }
+//    }
+
+    List<Stmt> parse(){
+        List<Stmt> statements = new ArrayList<>();
+        while(!isAtEnd()){
+            statements.add(declaration());
         }
+
+        return statements;
     }
 
     //GRAMMAR RULES HERE-------------------------------------------------------------------------
 
     /*
-    expression     → equality ;
+    program        → declaration* EOF ;
+    declaration    → varDecl | statement ;
+    statement      → exprStmt | printStmt | block ;
+    exprStmt       → expression ";" ;
+    printStmt      → "print" expression ";" ;
+    block          → "{" declaration* "}" ;
+
+    expression     → or ;
+    or             → and ( "or" and )* ;
+    and            → equality ( "and" equality )* ;
     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
     comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
     term           → factor ( ( "-" | "+" ) factor )* ;
     factor         → unary ( ( "/" | "*" ) unary )* ;
     unary          → ( "!" | "-" ) unary | primary ;
-    primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+    primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
+;
     */
 
+    // ADDED GRAMMAR FOR STATEMENTS
+    private Stmt declaration(){
+        System.out.println("In declaration() - current token: " + peek());
+        try{
+            if(match(DECLARE)){
+                return varDeclaration();
+            }
+
+            return statement();
+        }catch(ParseError error){
+            synchronize();
+            return null;
+        }
+    }
+
+    private Stmt varDeclaration() {
+        System.out.println("In varDeclaration() - current token: " + peek());
+            // check if a data type is provided
+        consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK");
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        return new Stmt.Var(name, initializer);
+    }
+
+    private Stmt statement(){
+        System.out.println("In statement() - current token: " + peek());
+        if(match(PRINT)){
+            return printStatement();
+        }else if(match(LEFT_CURLY)){
+            return new Stmt.Block(block());
+        }
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement(){
+        System.out.println("In printStatement() - current token: " + peek());
+        Expr value = expression();
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement(){
+        System.out.println("In expressionStatement() - current token: " + peek());
+        Expr expr = expression();
+        return new Stmt.Expression(expr);
+    }
+
+    private List<Stmt> block() {
+        List<Stmt> innerStatements = new ArrayList<>();
+
+        while (!check(RIGHT_CURLY) && !isAtEnd()) {
+            innerStatements.add(declaration());
+        }
+
+        consume(RIGHT_CURLY, "Expect '}' after block.");
+        return innerStatements;
+    }
+
+
+    //TODO: LOGICAL OPERATORS (OR, AND) *** [CHECKED]
+    //TODO: IMPLEMENT CONCAT
+
     private Expr expression(){
-        return equality();
+        System.out.println("In expression() - current token: " + peek());
+//        return or();
+        return assignment();
+    }
+
+    private Expr assignment(){
+        Expr expr = or();
+
+        if(match(EQUAL)){
+            Token equals = previous();
+            Expr value = assignment();
+
+            if(expr instanceof Expr.Variable){
+                Token name = ((Expr.Variable) expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private Expr or(){
+        System.out.println("In or() - current token: " + peek());
+        Expr expr = and();
+
+        while(match(OR)){
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr and(){
+        System.out.println("In and() - current token: " + peek());
+        Expr expr = equality();
+
+        while(match(AND)){
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
     }
 
     private Expr equality(){
+        System.out.println("In equality() - current token: " + peek());
         Expr expr = comparison();
 
         while(match(NOT_EQUAL, EQUAL_EQUAL)){
@@ -50,6 +184,7 @@ class Parser {
     }
 
     private Expr comparison(){
+        System.out.println("In comparison() - current token: " + peek());
         Expr expr = term();
 
         while(match(GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL)){
@@ -62,6 +197,7 @@ class Parser {
     }
 
     private Expr term(){
+        System.out.println("In term() - current token: " + peek());
         Expr expr = factor();
 
         while(match(MINUS, PLUS)){
@@ -74,6 +210,7 @@ class Parser {
     }
 
     private Expr factor() {
+        System.out.println("In factor() - current token: " + peek());
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
@@ -86,6 +223,7 @@ class Parser {
     }
 
     private Expr unary() {
+        System.out.println("In unary() - current token: " + peek());
         if (match(NOT, MINUS)) {
             Token operator = previous();
             Expr right = unary();
@@ -96,16 +234,19 @@ class Parser {
     }
 
     private Expr primary() {
+        System.out.println("In primary() - current token: " + peek());
         if (match(FALSE)) {
             return new Expr.Literal(false);
         } else if (match(TRUE)) {
             return new Expr.Literal(true);
-        } else if (match(NUMBER, STRING)) {
+        } else if (match(NUMBER, STRING, DOUBLE)) {
             return new Expr.Literal(previous().literal);
         } else if (match(LEFT_PAREN)) {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
+        }else if(match(IDENTIFIER)){
+            return new Expr.Variable(previous());
         }
 
         throw error(peek(), "Expect expression.");
@@ -124,7 +265,7 @@ class Parser {
         return false;
     }
 
-    private boolean check(TokenType type) {
+    private boolean check(TokenType  type) {
         if (isAtEnd()) return false;
         return peek().type == type;
     }
@@ -148,7 +289,16 @@ class Parser {
 
     //Same like match method but it can only advance if it is the expected token type
     private Token consume(TokenType type, String message) {
+        //check if the current token is a right paren
         if (check(type)) return advance();
+
+        throw error(peek(), message);
+    }
+
+    private Token consumeDataType(String message){
+        if(match(NUMBER, DOUBLE, CHARACTER, BOOLEAN)){
+            return previous();
+        }
 
         throw error(peek(), message);
     }

@@ -148,8 +148,7 @@ class Scanner {
                     //TODO: SOME RESERVED WORDS ARE SEPARATED BY SPACE. EX. "KUNG WALA"
                     identifierOrReserved();
                 } else {
-                    Bisaya.error(line, "Unexpected character.");
-                    //Bisaya.error(line, "ASCII of the character: " + (int) c);
+                    Bisaya.error(line, String.format("Unexpected character: %c", c));
                 }
                 break;
         }
