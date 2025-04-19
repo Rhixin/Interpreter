@@ -45,6 +45,8 @@ class Scanner {
 
         keywords.put("PUNDOK",  BLOCK);
         keywords.put("DAWAT",  SCAN);
+
+        keywords.put("SAMTANG", WHILE);
     }
 
     //helpers in scanning
@@ -68,6 +70,7 @@ class Scanner {
         //Appends one final “end of file” token
         //this is important ensuring the parses knows the end of the input
         tokens.add(new Token(EOF, "", null, line));
+
         return tokens;
     }
 

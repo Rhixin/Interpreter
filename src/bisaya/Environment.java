@@ -67,7 +67,8 @@ public class Environment {
         if (expected == actual) return true;
 
         // Allow implicit widening: NUMBER → DOUBLE
-        return expected == TokenType.DOUBLE && actual == TokenType.NUMBER;
+        return expected == TokenType.DOUBLE && actual == TokenType.NUMBER ||
+                expected == TokenType.NUMBER && actual == TokenType.DOUBLE;
     }
 
     private TokenType getTokenTypeFromValue(Object value) {

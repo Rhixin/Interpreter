@@ -23,9 +23,18 @@ class Parser {
 //    }
 
     List<Stmt> parse(){
+        consume(START, "Ang programa wala’y sinugdanan nga simbolo: SUGOD");
         List<Stmt> statements = new ArrayList<>();
-        while(!isAtEnd()){
+
+        //loop until EOF or makita og KATAPUSAN
+        while(!check(END) && !isAtEnd()){
             statements.add(declaration());
+        }
+
+        //check if KATAPUSAN
+        //if EOF, meaning no KATAPUSAN
+        if (!match(END)) {
+            error(peek(), "Ang programa kinahanglan og panapos nga simbolo: KATAPUSAN");
         }
 
         return statements;
@@ -36,12 +45,15 @@ class Parser {
     /*
     program        → declaration* EOF ;
     declaration    → varDecl | statement ;
-    statement      → exprStmt | printStmt | block | ifStmt;
+    statement      → exprStmt | printStmt | block | ifStmt | whileStmt;
+
     exprStmt       → expression ";" ;
     printStmt      → "print" expression ";" ;
     block          → "{" declaration* "}" ;
     ifStmt         → "if" "(" expression ")" statement
                         ( "else" statement )? ;
+    whileStmt      → "while" "(" expression ")" statement ;
+
 
     expression     → assignment ;
     assignment     → IDENTIFIER "=" assignment
@@ -90,7 +102,9 @@ class Parser {
         System.out.println("In statement() - current token: " + peek());
         if(match(IF)){
             return ifStatement();
-        } else if(match(PRINT)){
+        } else if(match(WHILE)){
+            return whileStatement();
+        }else if(match(PRINT)){
             return printStatement();
         }else if(match(LEFT_CURLY)){
             return new Stmt.Block(block());
@@ -118,6 +132,18 @@ class Parser {
         }
 
         return new Stmt.If(condition, thenBranch, elseBranch);
+    }
+
+    private Stmt whileStatement(){
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+
+//        consume(LEFT_CURLY, "Expect {.");
+
+        Stmt body = statement();
+
+        return new Stmt.While(condition, body);
     }
 
     private Stmt printStatement(){
@@ -227,7 +253,7 @@ class Parser {
         System.out.println("In term() - current token: " + peek());
         Expr expr = factor();
 
-        while(match(MINUS, PLUS)){
+        while(match(MINUS, PLUS, MODULO)){
             Token operator = previous();
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);

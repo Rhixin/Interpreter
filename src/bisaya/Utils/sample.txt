@@ -1,10 +1,17 @@
-MUGNA NUMERO a = 100
-MUGNA NUMERO b = 20
-KUNG (b > a)
-    PUNDOK {
-        IPAKITA "mas dako si b"
+SUGOD
+    MUGNA NUMERO a = 100
+    MUGNA NUMERO b = 20
+    KUNG (a % b == 0)
+        PUNDOK {
+            IPAKITA "a is divisible by b"
+        }
+    KUNG DILI
+        PUNDOK {
+            IPAKITA "a is not divisible by b"
+        }
+
+    SAMTANG (a > b) {
+        IPAKITA b
+        b = b + 10
     }
-KUNG DILI
-    PUNDOK {
-        IPAKITA "mas dako si a"
-    }
+

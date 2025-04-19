@@ -36,6 +36,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         } finally {
             this.environment = previous; // restore the environment
         }
+    } private boolean typeCompatible(TokenType expected, TokenType actual) {
+        if (expected == actual) return true;
+
+        // Allow implicit widening: NUMBER → DOUBLE
+        return expected == TokenType.DOUBLE && actual == TokenType.NUMBER;
     }
 
     @Override
@@ -93,6 +98,9 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             case SLASH:
                 //TODO: Implement division by zero
                 checkNumberOperands(expr.operator, left, right);
+                if (toDouble(right) == 0) {
+                    throw new RuntimeError(expr.operator, "Cannot divide by zero.");
+                }
                 return toDouble(left) / toDouble(right);
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
@@ -113,6 +121,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             case LESSER_EQUAL:
                 checkNumberOperands(expr.operator, left, right);
                 return toDouble(left) <= toDouble(right);
+            case MODULO:
+                checkNumberOperands(expr.operator, left, right);
+                if (toDouble(right) == 0) {
+                    throw new RuntimeError(expr.operator, "Cannot modulo by zero.");
+                }
+                return toDouble(left) % toDouble(right);
         }
 
         //Unreachable
@@ -197,6 +211,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         return null;
     }
 
+    @Override
+    public Void visitWhileStmt(Stmt.While stmt) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body);
+        }
+        return null;
+    }
 
     //HELPER FUNCTIONS----------------------------------------------------------------------------------
     private boolean isTruthy(Object object){
@@ -211,6 +232,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     private boolean isEqual(Object a, Object b) {
         if (a == null && b == null) return true;
         if (a == null) return false;
+
+        //TODO
+        //special case when comparing 1 == 1.0 (evals to false)
+        //or 0.0 == 0 (evals to false)
 
         return a.equals(b);
     }
