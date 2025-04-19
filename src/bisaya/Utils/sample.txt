@@ -1,17 +1,6 @@
 SUGOD
-    MUGNA NUMERO a = 100
-    MUGNA NUMERO b = 20
-    KUNG (a % b == 0)
-        PUNDOK {
-            IPAKITA "a is divisible by b"
-        }
-    KUNG DILI
-        PUNDOK {
-            IPAKITA "a is not divisible by b"
-        }
-
-    SAMTANG (a > b) {
-        IPAKITA b
-        b = b + 10
+    MUGNA NUMERO x = 10
+    ALANG SA (MUGNA NUMERO a = 0, a < x, a = a + 1 ) {
+        IPAKITA a
     }
-
+KATAPUSAN

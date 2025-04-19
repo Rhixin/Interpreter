@@ -1,6 +1,7 @@
 package bisaya;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,7 +46,7 @@ class Parser {
     /*
     program        → declaration* EOF ;
     declaration    → varDecl | statement ;
-    statement      → exprStmt | printStmt | block | ifStmt | whileStmt;
+    statement      → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt;
 
     exprStmt       → expression ";" ;
     printStmt      → "print" expression ";" ;
@@ -53,11 +54,14 @@ class Parser {
     ifStmt         → "if" "(" expression ")" statement
                         ( "else" statement )? ;
     whileStmt      → "while" "(" expression ")" statement ;
+    forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+                     expression? ";"
+                     expression? ")" statement ;
 
 
     expression     → assignment ;
-    assignment     → IDENTIFIER "=" assignment
-                        | or ;
+    assignment     → IDENTIFIER "=" assignment | concat ;
+    concat         → or ( "&" or )* ;
     or             → and ( "or" and )* ;
     and            → equality ( "and" equality )* ;
     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -71,7 +75,7 @@ class Parser {
 
     // ADDED GRAMMAR FOR STATEMENTS
     private Stmt declaration(){
-        System.out.println("In declaration() - current token: " + peek());
+//        System.out.println("In declaration() - current token: " + peek());
         try{
             if(match(DECLARE)){
                 return varDeclaration();
@@ -85,10 +89,10 @@ class Parser {
     }
 
     private Stmt varDeclaration() {
-        System.out.println("In varDeclaration() - current token: " + peek());
+//        System.out.println("In varDeclaration() - current token: " + peek());
             // check if a data type is provided
         consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK");
-        Token name = consume(IDENTIFIER, "Expect variable name.");
+        Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
 
         Expr initializer = null;
         if (match(EQUAL)) {
@@ -99,9 +103,11 @@ class Parser {
     }
 
     private Stmt statement(){
-        System.out.println("In statement() - current token: " + peek());
-        if(match(IF)){
+//        System.out.println("In statement() - current token: " + peek());
+        if(match(IF)) {
             return ifStatement();
+        }else if(match(FOR)){
+            return forStatement();
         } else if(match(WHILE)){
             return whileStatement();
         }else if(match(PRINT)){
@@ -114,30 +120,75 @@ class Parser {
     }
 
     private Stmt ifStatement(){
-        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        consume(LEFT_PAREN, "Nagdahom og '(' human sa 'KUNG'.");
         Expr condition = expression();
-        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+        consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'IF STATEMENT'.");
 
-        consume(BLOCK, "Expect PUNDOK as start of block");
-        consume(LEFT_CURLY, "Expect opening {");
+        consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
+        consume(LEFT_CURLY, "Nagdahom og '{' human sa 'PUNDOK'");
 
         Stmt thenBranch = statement();
 
-        consume(RIGHT_CURLY, "Expect closing }");
+        consume(RIGHT_CURLY, "Nagdahom og '}' silbe panapos sa usa ka tapok.");
 
         Stmt elseBranch = null;
         if (match(ELSE)) {
-            consume(BLOCK, "Expect PUNDOK as start of block");
+            consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
             elseBranch = statement();
         }
 
         return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
+    private Stmt forStatement(){
+        consume(LEFT_PAREN, "Nagdahom og '(' human sa 'ALANG SA'.");
+
+        Stmt initializer;
+        if(match(COMMA)){
+            initializer = null; // FOR(,,) - infinite
+        }else if(match(DECLARE)){
+            initializer = varDeclaration();
+            consume(COMMA, "Nagdahom og ',' human sa pagdeklara sa sulodanan.");
+        }else {
+            initializer = expressionStatement();
+            consume(COMMA, "Nagdahom og ',' human sa ekspresyon.");
+        }
+
+        Expr condition = null;
+        if(!check(COMMA)){ // if naa shay condition pa, meaning wa dayon comma eg. (, condition,)
+            condition = expression();
+        }
+
+        //check og closing comma sa condition regardless if naa or wala, naa jud comma after dapat for completeness
+        consume(COMMA, "Nagdahom og ',' human sa sinugdanan sa kondisyon.");
+
+        Expr increment = null;
+        if(!check(COMMA)){
+            increment = expression();
+        }
+
+        consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'FOR LOOP'.");
+
+        Stmt body = statement();
+
+        if (increment != null) {
+            body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
+        }
+
+        if(condition == null) condition = new Expr.Literal(true); //loop infinitely
+        body = new Stmt.While(condition, body);
+
+        if(initializer != null){
+            body = new Stmt.Block(Arrays.asList(initializer, body));
+        }
+
+        return body;
+    }
+
     private Stmt whileStatement(){
-        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        consume(LEFT_PAREN, "Nagdahom og '(' human sa 'SAMTANG'.");
         Expr condition = expression();
-        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'WHILE LOOP'.");
 
 //        consume(LEFT_CURLY, "Expect {.");
 
@@ -147,13 +198,13 @@ class Parser {
     }
 
     private Stmt printStatement(){
-        System.out.println("In printStatement() - current token: " + peek());
+//        System.out.println("In printStatement() - current token: " + peek());
         Expr value = expression();
         return new Stmt.Print(value);
     }
 
     private Stmt expressionStatement(){
-        System.out.println("In expressionStatement() - current token: " + peek());
+//        System.out.println("In expressionStatement() - current token: " + peek());
         Expr expr = expression();
         return new Stmt.Expression(expr);
     }
@@ -165,7 +216,7 @@ class Parser {
             innerStatements.add(declaration());
         }
 
-        consume(RIGHT_CURLY, "Expect '}' after block.");
+        consume(RIGHT_CURLY, "Nagdahom og '}' silbe panapos sa usa ka tapok.");
         return innerStatements;
     }
 
@@ -174,13 +225,13 @@ class Parser {
     //TODO: IMPLEMENT CONCAT
 
     private Expr expression(){
-        System.out.println("In expression() - current token: " + peek());
+//        System.out.println("In expression() - current token: " + peek());
 //        return or();
         return assignment();
     }
 
     private Expr assignment(){
-        Expr expr = or();
+        Expr expr = concatenation();
 
         if(match(EQUAL)){
             Token equals = previous();
@@ -197,6 +248,18 @@ class Parser {
         return expr;
     }
 
+    private Expr concatenation(){
+        Expr expr = or();
+        while (match(CONCAT)) {
+            Token operator = previous();
+            Expr right = or();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+
     private Expr or(){
         System.out.println("In or() - current token: " + peek());
         Expr expr = and();
@@ -211,7 +274,7 @@ class Parser {
     }
 
     private Expr and(){
-        System.out.println("In and() - current token: " + peek());
+//        System.out.println("In and() - current token: " + peek());
         Expr expr = equality();
 
         while(match(AND)){
@@ -224,7 +287,7 @@ class Parser {
     }
 
     private Expr equality(){
-        System.out.println("In equality() - current token: " + peek());
+//        System.out.println("In equality() - current token: " + peek());
         Expr expr = comparison();
 
         while(match(NOT_EQUAL, EQUAL_EQUAL)){
@@ -237,7 +300,7 @@ class Parser {
     }
 
     private Expr comparison(){
-        System.out.println("In comparison() - current token: " + peek());
+//        System.out.println("In comparison() - current token: " + peek());
         Expr expr = term();
 
         while(match(GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL)){
@@ -250,7 +313,7 @@ class Parser {
     }
 
     private Expr term(){
-        System.out.println("In term() - current token: " + peek());
+//        System.out.println("In term() - current token: " + peek());
         Expr expr = factor();
 
         while(match(MINUS, PLUS, MODULO)){
@@ -263,7 +326,7 @@ class Parser {
     }
 
     private Expr factor() {
-        System.out.println("In factor() - current token: " + peek());
+//        System.out.println("In factor() - current token: " + peek());
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
@@ -276,7 +339,7 @@ class Parser {
     }
 
     private Expr unary() {
-        System.out.println("In unary() - current token: " + peek());
+//        System.out.println("In unary() - current token: " + peek());
         if (match(NOT, MINUS)) {
             Token operator = previous();
             Expr right = unary();
@@ -287,7 +350,7 @@ class Parser {
     }
 
     private Expr primary() {
-        System.out.println("In primary() - current token: " + peek());
+//        System.out.println("In primary() - current token: " + peek());
         if (match(FALSE)) {
             return new Expr.Literal(false);
         } else if (match(TRUE)) {
@@ -344,7 +407,6 @@ class Parser {
     private Token consume(TokenType type, String message) {
         //check if the current token is a right paren
         if (check(type)) return advance();
-
         throw error(peek(), message);
     }
 

@@ -36,7 +36,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         } finally {
             this.environment = previous; // restore the environment
         }
-    } private boolean typeCompatible(TokenType expected, TokenType actual) {
+    }
+    private boolean typeCompatible(TokenType expected, TokenType actual) {
         if (expected == actual) return true;
 
         // Allow implicit widening: NUMBER → DOUBLE
@@ -127,6 +128,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                     throw new RuntimeError(expr.operator, "Cannot modulo by zero.");
                 }
                 return toDouble(left) % toDouble(right);
+            case CONCAT:
+                return left.toString() + right.toString();
         }
 
         //Unreachable
@@ -189,10 +192,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     }
 
     @Override
-        public Void visitBlockStmt(Stmt.Block stmt) {
-            executeBlock(stmt.statements, new Environment(environment));
-            return null;
-        }
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
 
     @Override
     public Void visitIfStmt(Stmt.If stmt) {

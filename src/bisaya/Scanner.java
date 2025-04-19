@@ -31,6 +31,7 @@ class Scanner {
         keywords.put("KUNG DILI",    ELSE);
 
         keywords.put("ALANG SA",    FOR);
+        keywords.put("ALANG",       FOR); //placeholder para ma scan pa ang 'SA'
 
         keywords.put("OO",   TRUE);
         keywords.put("DILI",  FALSE);
@@ -244,6 +245,7 @@ class Scanner {
         }
 
         String text = source.substring(start, current);
+        System.out.println("Original string: " + text);
 
         //Check from the reserved keywords if the scanned text is found there
         TokenType type = keywords.get(text);
@@ -270,12 +272,11 @@ class Scanner {
             }
 
             String potentialSecondKeyword = source.substring(tempStart, current);
+            System.out.println("Checking the keywords: " + text + " " + potentialSecondKeyword);
 
             //now concat the two keywords
             TokenType type2 = keywords.get(text + " " + potentialSecondKeyword);
-            if(type2 == ELSE_IF){
 
-            }
             if(type2 == null){ //meaning the second word is not a valid second keyword
                 // we revert the values of the marker variables to their original values
                 current = preservedCurrValue;

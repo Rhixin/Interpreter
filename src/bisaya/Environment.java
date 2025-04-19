@@ -30,8 +30,7 @@ public class Environment {
         //crawl up sa scope
         if(enclosing != null) return enclosing.get(name);
 
-        throw new RuntimeError(name,
-                "Undefined variable '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
 
     TokenType getType(String name) {
