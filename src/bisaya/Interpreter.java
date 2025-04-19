@@ -158,7 +158,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println(stringify(value));
+        System.out.println("Output: " + stringify(value));
         return null;
     }
 
@@ -182,6 +182,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitIfStmt(Stmt.If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+//            System.out.println("Executing then branch...");
+            execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+//            System.out.println("Executing else branch...");
+            execute(stmt.elseBranch);
+        }
         return null;
     }
 

@@ -1,3 +1,10 @@
-MUGNA TIPIK a = 1.3
-NUMERO a = "string"
-IPAKITA a
+MUGNA NUMERO a = 100
+MUGNA NUMERO b = 20
+KUNG (b > a)
+    PUNDOK {
+        IPAKITA "mas dako si b"
+    }
+KUNG DILI
+    PUNDOK {
+        IPAKITA "mas dako si a"
+    }
