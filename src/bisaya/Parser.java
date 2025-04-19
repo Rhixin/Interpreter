@@ -36,12 +36,16 @@ class Parser {
     /*
     program        → declaration* EOF ;
     declaration    → varDecl | statement ;
-    statement      → exprStmt | printStmt | block ;
+    statement      → exprStmt | printStmt | block | ifStmt;
     exprStmt       → expression ";" ;
     printStmt      → "print" expression ";" ;
     block          → "{" declaration* "}" ;
+    ifStmt         → "if" "(" expression ")" statement
+                        ( "else" statement )? ;
 
-    expression     → or ;
+    expression     → assignment ;
+    assignment     → IDENTIFIER "=" assignment
+                        | or ;
     or             → and ( "or" and )* ;
     and            → equality ( "and" equality )* ;
     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -84,13 +88,36 @@ class Parser {
 
     private Stmt statement(){
         System.out.println("In statement() - current token: " + peek());
-        if(match(PRINT)){
+        if(match(IF)){
+            return ifStatement();
+        } else if(match(PRINT)){
             return printStatement();
         }else if(match(LEFT_CURLY)){
             return new Stmt.Block(block());
         }
 
         return expressionStatement();
+    }
+
+    private Stmt ifStatement(){
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        consume(BLOCK, "Expect PUNDOK as start of block");
+        consume(LEFT_CURLY, "Expect opening {");
+
+        Stmt thenBranch = statement();
+
+        consume(RIGHT_CURLY, "Expect closing }");
+
+        Stmt elseBranch = null;
+        if (match(ELSE)) {
+            consume(BLOCK, "Expect PUNDOK as start of block");
+            elseBranch = statement();
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
     private Stmt printStatement(){

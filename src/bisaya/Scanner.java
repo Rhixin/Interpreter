@@ -270,6 +270,9 @@ class Scanner {
 
             //now concat the two keywords
             TokenType type2 = keywords.get(text + " " + potentialSecondKeyword);
+            if(type2 == ELSE_IF){
+
+            }
             if(type2 == null){ //meaning the second word is not a valid second keyword
                 // we revert the values of the marker variables to their original values
                 current = preservedCurrValue;
