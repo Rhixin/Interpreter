@@ -1,6 +1,12 @@
 SUGOD
-    MUGNA NUMERO x = 10
-    ALANG SA (MUGNA NUMERO a = 0, a < x, a = a + 1 ) {
-        IPAKITA a
+    MUGNA NUMERO y = 20
+    SAMTANG (y > 0)
+    PUNDOK {
+        KUNG (y % 2 == 0)
+        PUNDOK {
+            IPAKITA y
+        }
+
+        y = y - 1
     }
 KATAPUSAN

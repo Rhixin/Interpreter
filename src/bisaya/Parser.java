@@ -75,7 +75,7 @@ class Parser {
 
     // ADDED GRAMMAR FOR STATEMENTS
     private Stmt declaration(){
-//        System.out.println("In declaration() - current token: " + peek());
+        System.out.println("In declaration() - current token: " + peek());
         try{
             if(match(DECLARE)){
                 return varDeclaration();
@@ -89,7 +89,7 @@ class Parser {
     }
 
     private Stmt varDeclaration() {
-//        System.out.println("In varDeclaration() - current token: " + peek());
+        System.out.println("In varDeclaration() - current token: " + peek());
             // check if a data type is provided
         consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK");
         Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
@@ -103,7 +103,7 @@ class Parser {
     }
 
     private Stmt statement(){
-//        System.out.println("In statement() - current token: " + peek());
+        System.out.println("In statement() - current token: " + peek());
         if(match(IF)) {
             return ifStatement();
         }else if(match(FOR)){
@@ -125,12 +125,13 @@ class Parser {
         consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'IF STATEMENT'.");
 
         consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
-        consume(LEFT_CURLY, "Nagdahom og '{' human sa 'PUNDOK'");
+//        consume(LEFT_CURLY, "Nagdahom og '{' human sa 'PUNDOK'");
 
         Stmt thenBranch = statement();
 
-        consume(RIGHT_CURLY, "Nagdahom og '}' silbe panapos sa usa ka tapok.");
+//        consume(RIGHT_CURLY, "Nagdahom og '}' silbe panapos sa usa ka tapok.");
 
+        //TODO: ELSE IF
         Stmt elseBranch = null;
         if (match(ELSE)) {
             consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
@@ -168,8 +169,12 @@ class Parser {
         }
 
         consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'FOR LOOP'.");
+        consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
+//        consume(LEFT_CURLY, "Nagdahom og '{' human sa 'PUNDOK'");
 
         Stmt body = statement();
+
+//        consume(RIGHT_CURLY, "Nagdahom og '}' silbe panapos sa usa ka tapok.");
 
         if (increment != null) {
             body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
@@ -187,24 +192,27 @@ class Parser {
 
     private Stmt whileStatement(){
         consume(LEFT_PAREN, "Nagdahom og '(' human sa 'SAMTANG'.");
-        Expr condition = expression();
-        consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'WHILE LOOP'.");
 
-//        consume(LEFT_CURLY, "Expect {.");
+        Expr condition = expression();
+
+        consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'WHILE LOOP'.");
+        consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
 
         Stmt body = statement();
+
+//        consume(RIGHT_CURLY, "Nagdahom og '}' silbe panapos sa usa ka tapok.");
 
         return new Stmt.While(condition, body);
     }
 
     private Stmt printStatement(){
-//        System.out.println("In printStatement() - current token: " + peek());
+        System.out.println("In printStatement() - current token: " + peek());
         Expr value = expression();
         return new Stmt.Print(value);
     }
 
     private Stmt expressionStatement(){
-//        System.out.println("In expressionStatement() - current token: " + peek());
+        System.out.println("In expressionStatement() - current token: " + peek());
         Expr expr = expression();
         return new Stmt.Expression(expr);
     }
@@ -225,7 +233,7 @@ class Parser {
     //TODO: IMPLEMENT CONCAT
 
     private Expr expression(){
-//        System.out.println("In expression() - current token: " + peek());
+        System.out.println("In expression() - current token: " + peek());
 //        return or();
         return assignment();
     }
@@ -274,7 +282,7 @@ class Parser {
     }
 
     private Expr and(){
-//        System.out.println("In and() - current token: " + peek());
+        System.out.println("In and() - current token: " + peek());
         Expr expr = equality();
 
         while(match(AND)){
@@ -287,7 +295,7 @@ class Parser {
     }
 
     private Expr equality(){
-//        System.out.println("In equality() - current token: " + peek());
+        System.out.println("In equality() - current token: " + peek());
         Expr expr = comparison();
 
         while(match(NOT_EQUAL, EQUAL_EQUAL)){
@@ -300,7 +308,7 @@ class Parser {
     }
 
     private Expr comparison(){
-//        System.out.println("In comparison() - current token: " + peek());
+        System.out.println("In comparison() - current token: " + peek());
         Expr expr = term();
 
         while(match(GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL)){
@@ -313,7 +321,7 @@ class Parser {
     }
 
     private Expr term(){
-//        System.out.println("In term() - current token: " + peek());
+        System.out.println("In term() - current token: " + peek());
         Expr expr = factor();
 
         while(match(MINUS, PLUS, MODULO)){
@@ -326,7 +334,7 @@ class Parser {
     }
 
     private Expr factor() {
-//        System.out.println("In factor() - current token: " + peek());
+        System.out.println("In factor() - current token: " + peek());
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
@@ -339,7 +347,7 @@ class Parser {
     }
 
     private Expr unary() {
-//        System.out.println("In unary() - current token: " + peek());
+        System.out.println("In unary() - current token: " + peek());
         if (match(NOT, MINUS)) {
             Token operator = previous();
             Expr right = unary();
@@ -350,7 +358,7 @@ class Parser {
     }
 
     private Expr primary() {
-//        System.out.println("In primary() - current token: " + peek());
+        System.out.println("In primary() - current token: " + peek());
         if (match(FALSE)) {
             return new Expr.Literal(false);
         } else if (match(TRUE)) {
