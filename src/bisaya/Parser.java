@@ -78,7 +78,7 @@ class Parser {
         System.out.println("In declaration() - current token: " + peek());
         try{
             if(match(DECLARE)){
-                return varDeclaration();
+                return varDeclaration(false);
             }
 
             return statement();
@@ -88,21 +88,21 @@ class Parser {
         }
     }
 
-//    private Stmt varDeclaration() {
-//        System.out.println("In varDeclaration() - current token: " + peek());
-//            // check if a data type is provided
-//        TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
-//        Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
-//
-//        Expr initializer = null;
-//        if (match(EQUAL)) {
-//            initializer = expression();
-//        }
-//
-//        return new Stmt.Var(name, dataType, initializer);
-//    }
+    private Stmt varDeclarationSingle() {
+        System.out.println("In varDeclaration() - current token: " + peek());
+            // check if a data type is provided
+        TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
+        Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
 
-    private Stmt varDeclaration() {
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        return new Stmt.Var(name, initializer, dataType);
+    }
+
+    private Stmt varDeclaration(boolean isForLoop) {
         System.out.println("In varDeclaration() - current token: " + peek());
         // check if a data type is provided
         TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
@@ -110,6 +110,12 @@ class Parser {
         List<Stmt.Var> declarations = new ArrayList<>();
 
         do{
+            // dapat sa for loop naay = jud
+            // dapat naka initialize sha
+            if(!checkNext(EQUAL) && isForLoop){
+                break;
+            }
+
             Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
 
             Expr initializer = null;
@@ -117,7 +123,7 @@ class Parser {
                 initializer = expression();
             }
 
-            declarations.add(new Stmt.Var(name, initializer));
+            declarations.add(new Stmt.Var(name, initializer, dataType));
         }while(match(COMMA));
 
         return new Stmt.MultiVar(dataType, declarations);
@@ -125,14 +131,16 @@ class Parser {
 
     private Stmt statement(){
         System.out.println("In statement() - current token: " + peek());
-        if(match(IF)) {
+        if(match(IF, ELSE_IF)) {
             return ifStatement();
         }else if(match(FOR)){
             return forStatement();
         } else if(match(WHILE)){
             return whileStatement();
-        }else if(match(PRINT)){
+        }else if(match(PRINT)) {
             return printStatement();
+        }else if(match(INPUT)){
+            return inputStatement();
         }else if(match(LEFT_CURLY)){
             return new Stmt.Block(block());
         }
@@ -159,9 +167,22 @@ class Parser {
             elseBranch = statement();
         }
 
+        if(check(ELSE_IF)){ //ayaw i consume aron ma match shas statement tas ma consider as new if
+            elseBranch = statement();
+        }
+
         return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
+    private Stmt inputStatement(){
+        List<Token> names = new ArrayList<>();
+
+        do {
+            names.add(consume(IDENTIFIER, "Nagdahom og ngalan sa sulodanan."));
+        } while (match(COMMA));
+
+        return new Stmt.Input(names);
+    }
     private Stmt forStatement(){
         consume(LEFT_PAREN, "Nagdahom og '(' human sa 'ALANG SA'.");
 
@@ -169,8 +190,8 @@ class Parser {
         if(match(COMMA)){
             initializer = null; // FOR(,,) - infinite
         }else if(match(DECLARE)){
-            initializer = varDeclaration();
-            consume(COMMA, "Nagdahom og ',' human sa pagdeklara sa sulodanan.");
+            initializer = varDeclaration(true);
+//            consume(COMMA, "Nagdahom og ',' human sa pagdeklara sa sulodanan.");
         }else {
             initializer = expressionStatement();
             consume(COMMA, "Nagdahom og ',' human sa ekspresyon.");
@@ -376,7 +397,19 @@ class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return primary();
+//        return primary();
+        return postfix();
+    }
+
+    private Expr postfix(){
+        Expr expr = primary();
+
+        while(match(INCREMENT)){
+            Token operator = previous();
+            expr = new Expr.Postfix(expr, operator);
+        }
+
+        return expr;
     }
 
     private Expr primary() {
@@ -385,9 +418,9 @@ class Parser {
             return new Expr.Literal(false);
         } else if (match(TRUE)) {
             return new Expr.Literal(true);
-        } else if (match(NUMBER, STRING, DOUBLE)) {
+        } else if (match(NUMBER, STRING, DOUBLE, CHARACTER, NEW_LINE)) {
             return new Expr.Literal(previous().literal);
-        } else if (match(LEFT_PAREN)) {
+        }else if (match(LEFT_PAREN)) {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
@@ -416,6 +449,13 @@ class Parser {
         return peek().type == type;
     }
 
+    private boolean checkNext(TokenType type) {
+        if (current + 1 >= tokens.size()) return false;
+        return peekNext().type == type;
+    }
+
+
+
     private Token advance() {
         if (!isAtEnd()) current++;
         return previous();
@@ -427,6 +467,10 @@ class Parser {
 
     private Token peek() {
         return tokens.get(current);
+    }
+
+    private Token peekNext(){
+        return tokens.get(current + 1);
     }
 
     private Token previous() {

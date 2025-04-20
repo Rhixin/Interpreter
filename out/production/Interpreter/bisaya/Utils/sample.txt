@@ -1,5 +1,22 @@
 SUGOD
-    MUGNA NUMERO d=1,a=10
-    IPAKITA: d
-    IPAKITA: a
+    MUGNA NUMERO a, b
+
+    DAWAT a, b
+
+    KUNG(a > b)
+    PUNDOK {
+        ALANG SA(MUGNA NUMERO ctr = 1, ctr < a, ctr++)
+        PUNDOK {
+            IPAKITA: ctr & ' '
+        }
+    }KUNG DILI(b > a)
+    PUNDOK {
+        ALANG SA(MUGNA NUMERO ctr = 1, ctr < b, ctr++)
+        PUNDOK {
+            IPAKITA: ctr & ' '
+        }
+    }KUNG WALA
+    PUNDOK {
+        IPAKITA: "equal ra silaa"
+    }
 KATAPUSAN

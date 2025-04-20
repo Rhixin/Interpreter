@@ -17,8 +17,9 @@ public class Environment {
     }
 
     void define(Token name, TokenType dataType, Object value) {
-        if(getTokenTypeFromValue(value) != dataType){
-            throw new RuntimeError(name, String.format("Ang gihatag nga bili '%s' wala magtugma sa iyang klase sa datos '%s'.", value.toString(), dataType));
+        TokenType givenType = getTokenTypeFromValue(value);
+        if(givenType != dataType && value != null){
+            throw new RuntimeError(name, String.format("Ang gihatag nga bili '%s' sa sulodanan nga '%s' wala magtugma sa iyang klase sa datos '%s'.", value, name.lexeme, dataType));
         }
 
         values.put(name.lexeme, value);
@@ -34,7 +35,7 @@ public class Environment {
         //crawl up sa scope
         if(enclosing != null) return enclosing.get(name);
 
-        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined variable FROM GET '" + name.lexeme + "'.");
     }
 
     TokenType getType(String name) {
@@ -48,8 +49,16 @@ public class Environment {
             TokenType expectedType = types.get(name.lexeme);
             TokenType givenNewType = getTokenTypeFromValue(value);
 
-            if(!typeCompatible(expectedType, givenNewType)){
-                throw new RuntimeError(name, String.format("Type mismatch: Cannot assign %s to %s", expectedType.toString(), givenNewType.toString()));
+//            if(!typeCompatible(expectedType, givenNewType)){
+//                throw new RuntimeError(name, String.format("Type mismatch: Cannot assign %s to %s", expectedType.toString(), givenNewType.toString()));
+//            }
+
+            if(expectedType != givenNewType){
+                if(expectedType == TokenType.NUMBER && givenNewType == TokenType.DOUBLE){
+                    value = ((Double) value).intValue();
+                }else{
+                    throw new RuntimeError(name, String.format("Ang gihatag nga bili '%s' sa sulodanan nga '%s' wala magtugma sa iyang klase sa datos '%s'.", value, name.lexeme, expectedType));
+                }
             }
 
             values.put(name.lexeme, value);
@@ -62,7 +71,7 @@ public class Environment {
             return;
         }
 
-        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined variable FROM ASSIGN'" + name.lexeme + "'.");
     }
 
     private boolean typeCompatible(TokenType expected, TokenType actual) {
@@ -78,6 +87,7 @@ public class Environment {
         if (value instanceof Integer) return TokenType.NUMBER;
         if (value instanceof Boolean) return TokenType.BOOLEAN;
         if (value instanceof String) return TokenType.STRING;
+        if (value instanceof Character) return TokenType.CHARACTER;
         return null;
     }
 

@@ -12,6 +12,7 @@ abstract class Stmt {
         R visitForStmt(While stmt);
         R visitWhileStmt(While stmt);
         R visitMultiVarStmt(MultiVar stmt);
+        R visitInputStmt(Input stmt);
 
     }
 
@@ -74,11 +75,23 @@ abstract class Stmt {
         }
     }
 
+    static class Input extends Stmt{
+        public final List<Token> names;
+
+        public Input(List<Token> names) {
+            this.names = names;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitInputStmt(this);
+        }
+    }
+
     static class Var extends Stmt {
         final Token name;
         final Expr initializer;
-
-        Var(Token name, Expr initializer) {
+        Var(Token name, Expr initializer, TokenType dataType) {
             this.name = name;
             this.initializer = initializer;
         }
@@ -86,6 +99,11 @@ abstract class Stmt {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitVarStmt(this);
+        }
+
+        @Override
+        public String toString(){
+            return name.lexeme;
         }
     }
 
