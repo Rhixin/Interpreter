@@ -45,6 +45,7 @@ abstract class Expr {
         R visitLiteralExpr(Literal expr);
         R visitLogicalExpr(Logical expr);
         R visitVariableExpr(Variable expr);
+        R visitPostfixExpr(Postfix expr);
     }
 
     abstract <R> R accept(Visitor<R> visitor);
@@ -66,6 +67,21 @@ abstract class Expr {
         @Override
         public String toString(){
             return String.format("Token: %s, Value: %s", name.lexeme, value);
+        }
+    }
+
+    static class Postfix extends Expr {
+        final Token operator;
+        final Expr expression;
+
+        Postfix(Expr expression, Token operator) {
+            this.expression = expression;
+            this.operator = operator;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitPostfixExpr(this);
         }
     }
 

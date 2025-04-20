@@ -1,7 +1,9 @@
 SUGOD
-    MUGNA NUMERO ctr
-    ALANG SA (ctr=1, ctr<=10, ctr = ctr + 1)
+    MUGNA NUMERO ctr, curr
+    ALANG SA (ctr=1, ctr<=10, ctr++)
     PUNDOK{
         IPAKITA: ctr & ' '
     }
+    curr = 200
+    IPAKITA: curr
 KATAPUSAN

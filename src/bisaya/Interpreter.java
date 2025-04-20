@@ -245,6 +245,30 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         return null;
     }
 
+    @Override
+    public Object visitPostfixExpr(Expr.Postfix expr) {
+        if (!(expr.expression instanceof Expr.Variable)) {
+            throw new RuntimeError(expr.operator, "Ang pagdungag og usa sa kantidad mamahimo ra sa sa usa ka sulodanan.");
+        }
+
+        Expr.Variable variable = (Expr.Variable) expr.expression;
+        Object value = environment.get(variable.name);
+
+        if (!(value instanceof Number)) {
+            throw new RuntimeError(expr.operator, "Pwede ra ma-increment ang mga numero.");
+        }
+
+        double current = toDouble(value);
+        double updated = expr.operator.type == TokenType.INCREMENT ? current + 1 : current - 1;
+
+        // Assign the updated value
+        environment.assign(variable.name, updated);
+
+        // Return the original value (postfix behavior)
+        return current;
+    }
+
+
 
     //HELPER FUNCTIONS----------------------------------------------------------------------------------
     private boolean isTruthy(Object object){

@@ -78,7 +78,7 @@ class Parser {
         System.out.println("In declaration() - current token: " + peek());
         try{
             if(match(DECLARE)){
-                return varDeclaration();
+                return varDeclaration(false);
             }
 
             return statement();
@@ -88,21 +88,21 @@ class Parser {
         }
     }
 
-//    private Stmt varDeclaration() {
-//        System.out.println("In varDeclaration() - current token: " + peek());
-//            // check if a data type is provided
-//        TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
-//        Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
-//
-//        Expr initializer = null;
-//        if (match(EQUAL)) {
-//            initializer = expression();
-//        }
-//
-//        return new Stmt.Var(name, dataType, initializer);
-//    }
+    private Stmt varDeclarationSingle() {
+        System.out.println("In varDeclaration() - current token: " + peek());
+            // check if a data type is provided
+        TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
+        Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
 
-    private Stmt varDeclaration() {
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        return new Stmt.Var(name, initializer, dataType);
+    }
+
+    private Stmt varDeclaration(boolean isForLoop) {
         System.out.println("In varDeclaration() - current token: " + peek());
         // check if a data type is provided
         TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
@@ -110,6 +110,11 @@ class Parser {
         List<Stmt.Var> declarations = new ArrayList<>();
 
         do{
+            //if di na sha assignment
+            if(!checkNext(EQUAL) && isForLoop){
+                break;
+            }
+
             Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
 
             Expr initializer = null;
@@ -117,7 +122,7 @@ class Parser {
                 initializer = expression();
             }
 
-            declarations.add(new Stmt.Var(name, initializer));
+            declarations.add(new Stmt.Var(name, initializer, dataType));
         }while(match(COMMA));
 
         return new Stmt.MultiVar(dataType, declarations);
@@ -173,8 +178,8 @@ class Parser {
         if(match(COMMA)){
             initializer = null; // FOR(,,) - infinite
         }else if(match(DECLARE)){
-            initializer = varDeclaration();
-            consume(COMMA, "Nagdahom og ',' human sa pagdeklara sa sulodanan.");
+            initializer = varDeclaration(true);
+//            consume(COMMA, "Nagdahom og ',' human sa pagdeklara sa sulodanan.");
         }else {
             initializer = expressionStatement();
             consume(COMMA, "Nagdahom og ',' human sa ekspresyon.");
@@ -380,7 +385,19 @@ class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return primary();
+//        return primary();
+        return postfix();
+    }
+
+    private Expr postfix(){
+        Expr expr = primary();
+
+        while(match(INCREMENT)){
+            Token operator = previous();
+            expr = new Expr.Postfix(expr, operator);
+        }
+
+        return expr;
     }
 
     private Expr primary() {
@@ -420,6 +437,13 @@ class Parser {
         return peek().type == type;
     }
 
+    private boolean checkNext(TokenType type) {
+        if (current + 1 >= tokens.size()) return false;
+        return peekNext().type == type;
+    }
+
+
+
     private Token advance() {
         if (!isAtEnd()) current++;
         return previous();
@@ -431,6 +455,10 @@ class Parser {
 
     private Token peek() {
         return tokens.get(current);
+    }
+
+    private Token peekNext(){
+        return tokens.get(current + 1);
     }
 
     private Token previous() {

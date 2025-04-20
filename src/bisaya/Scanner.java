@@ -93,7 +93,9 @@ class Scanner {
                 escape();
                 break;
 //            case ']': addToken(RIGHT_BRACE); break;
-            case '+': addToken(PLUS); break;
+            case '+':
+                addToken(match('+') ? INCREMENT : PLUS);
+                break;
             case '*': addToken(STAR); break;
             case '/': addToken(SLASH); break;
             case '%': addToken(MODULO); break;

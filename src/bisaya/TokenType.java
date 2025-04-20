@@ -11,6 +11,9 @@ enum TokenType {
     //$, &
     NEW_LINE, CONCAT,
 
+    //++, --
+    INCREMENT, DECREMENT,
+
     // One or two character tokens OR misleading tokens.-----------------------------
     //>, >=
     GREATER, GREATER_EQUAL,
