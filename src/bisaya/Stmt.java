@@ -10,6 +10,9 @@ abstract class Stmt {
         R visitPrintStmt(Print stmt);
         R visitVarStmt(Var stmt);
         R visitForStmt(While stmt);
+        R visitWhileStmt(While stmt);
+        R visitMultiVarStmt(MultiVar stmt);
+
     }
 
     abstract <R> R accept(Visitor<R> visitor);
@@ -86,6 +89,21 @@ abstract class Stmt {
         }
     }
 
+    public static class MultiVar extends Stmt {
+        public final TokenType dataType;
+        public final List<Var> vars;
+
+        public MultiVar(TokenType dataType, List<Var> vars) {
+            this.dataType = dataType;
+            this.vars = vars;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitMultiVarStmt(this);
+        }
+    }
+
     static class While extends Stmt {
         final Expr condition;
         final Stmt body;
@@ -97,7 +115,7 @@ abstract class Stmt {
 
         @Override
         <R> R accept(Visitor<R> visitor) {
-            return visitor.visitForStmt(this);
+            return visitor.visitWhileStmt(this);
         }
     }
 

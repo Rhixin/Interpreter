@@ -7,7 +7,7 @@ enum TokenType {
     //+ , /, *, %, =
     PLUS, SLASH, STAR, MODULO, EQUAL,
     //,
-    COMMA,
+    COMMA, COLON,
     //$, &
     NEW_LINE, CONCAT,
 
@@ -23,7 +23,7 @@ enum TokenType {
     IDENTIFIER, NUMBER, DOUBLE, CHARACTER, BOOLEAN,
 
     // Keywords.---------------------------------------------------------------------
-    START, END, DECLARE, PRINT, BLOCK, FOR, SCAN, AND, OR, TRUE, NOT, FALSE, IF, ELSE_IF, ELSE,
+    START, END, DECLARE, PRINT, BLOCK, FOR, SCAN, AND, OR, TRUE, NOT, FALSE, IF, ELSE_IF, ELSE, WHILE,
 
 
     //??------------------------------------------------------------------------------

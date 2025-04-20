@@ -16,10 +16,14 @@ public class Environment {
         this.enclosing = enclosing;
     }
 
-    void define(String name, Object value) {
-        values.put(name, value);
-        TokenType type = getTokenTypeFromValue(value);
-        types.put(name, type);
+    void define(Token name, TokenType dataType, Object value) {
+        if(getTokenTypeFromValue(value) != dataType){
+            throw new RuntimeError(name, String.format("Ang gihatag nga bili '%s' wala magtugma sa iyang klase sa datos '%s'.", value.toString(), dataType));
+        }
+
+        values.put(name.lexeme, value);
+//        TokenType type = getTokenTypeFromValue(value)
+        types.put(name.lexeme, dataType);
     }
 
     Object get(Token name) {
@@ -30,8 +34,7 @@ public class Environment {
         //crawl up sa scope
         if(enclosing != null) return enclosing.get(name);
 
-        throw new RuntimeError(name,
-                "Undefined variable '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
 
     TokenType getType(String name) {
@@ -59,15 +62,15 @@ public class Environment {
             return;
         }
 
-        throw new RuntimeError(name,
-                "Undefined variable '" + name.lexeme + "'.");
+        throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
 
     private boolean typeCompatible(TokenType expected, TokenType actual) {
         if (expected == actual) return true;
 
         // Allow implicit widening: NUMBER → DOUBLE
-        return expected == TokenType.DOUBLE && actual == TokenType.NUMBER;
+        return expected == TokenType.DOUBLE && actual == TokenType.NUMBER ||
+                expected == TokenType.NUMBER && actual == TokenType.DOUBLE;
     }
 
     private TokenType getTokenTypeFromValue(Object value) {

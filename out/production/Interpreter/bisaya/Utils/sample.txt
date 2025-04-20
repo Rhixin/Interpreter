@@ -1,10 +1,5 @@
-MUGNA NUMERO a = 100
-MUGNA NUMERO b = 20
-KUNG (b > a)
-    PUNDOK {
-        IPAKITA "mas dako si b"
-    }
-KUNG DILI
-    PUNDOK {
-        IPAKITA "mas dako si a"
-    }
+SUGOD
+    MUGNA NUMERO d=1,a=10
+    IPAKITA: d
+    IPAKITA: a
+KATAPUSAN
