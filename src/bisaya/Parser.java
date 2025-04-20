@@ -125,7 +125,7 @@ class Parser {
 
     private Stmt statement(){
         System.out.println("In statement() - current token: " + peek());
-        if(match(IF)) {
+        if(match(IF, ELSE_IF)) {
             return ifStatement();
         }else if(match(FOR)){
             return forStatement();
@@ -156,6 +156,10 @@ class Parser {
         Stmt elseBranch = null;
         if (match(ELSE)) {
             consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
+            elseBranch = statement();
+        }
+
+        if(check(ELSE_IF)){ //ayaw i consume aron ma match shas statement tas ma consider as new if
             elseBranch = statement();
         }
 
@@ -385,9 +389,9 @@ class Parser {
             return new Expr.Literal(false);
         } else if (match(TRUE)) {
             return new Expr.Literal(true);
-        } else if (match(NUMBER, STRING, DOUBLE)) {
+        } else if (match(NUMBER, STRING, DOUBLE, CHARACTER, NEW_LINE)) {
             return new Expr.Literal(previous().literal);
-        } else if (match(LEFT_PAREN)) {
+        }else if (match(LEFT_PAREN)) {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);

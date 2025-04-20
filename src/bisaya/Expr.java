@@ -62,6 +62,11 @@ abstract class Expr {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitAssignExpr(this);
         }
+
+        @Override
+        public String toString(){
+            return String.format("Token: %s, Value: %s", name.lexeme, value);
+        }
     }
 
     static class Unary extends Expr {

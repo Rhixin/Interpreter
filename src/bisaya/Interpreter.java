@@ -80,10 +80,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 return toDouble(left) - toDouble(right);
             case PLUS:
                 //TODO: Implement concat when either one of the operand is a string
-                if (left instanceof Number && right instanceof Number) {
-                    return toDouble(left) + toDouble(right);
+//                if (left instanceof Number && right instanceof Number) {
+//                    return toDouble(left) + toDouble(right);
+//                }
+
+                //both integer sha
+                if (left instanceof Integer && right instanceof Integer) {
+                    return ((Integer) left) + ((Integer) right); // Returns Integer
                 }
 
+                //both sha strings
+                if(left instanceof Double || right instanceof Double){
+                    return toDouble(left) + toDouble(right); // Returns Double
+                }
+
+                //both strings
                 if (left instanceof String && right instanceof String) {
                     return (String)left + (String)right;
                 }
@@ -129,7 +140,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 }
                 return toDouble(left) % toDouble(right);
             case CONCAT:
-                return left.toString() + right.toString();
+                return stringify(left) + stringify(right);
         }
 
         //Unreachable
@@ -175,7 +186,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
-        System.out.println("Output: " + stringify(value));
+        System.out.print(stringify(value));
         return null;
     }
 
@@ -273,6 +284,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     private String stringify(Object object) {
         if (object == null) return "null";
+
+        if (object instanceof Boolean) {
+            return (Boolean) object ? "OO" : "DILI";
+        }
 
         if (object instanceof Double) {
             String text = object.toString();

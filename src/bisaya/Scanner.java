@@ -27,8 +27,8 @@ class Scanner {
         keywords.put("BALI",  NOT);
 
         keywords.put("KUNG",     IF);
-        keywords.put("KUNG WALA",   ELSE_IF);
-        keywords.put("KUNG DILI",    ELSE);
+        keywords.put("KUNG WALA", ELSE); //both considered ra nga else
+        keywords.put("KUNG DILI",    ELSE_IF);
 
         keywords.put("ALANG SA",    FOR);
         keywords.put("ALANG",       FOR); //placeholder para ma scan pa ang 'SA'
@@ -88,14 +88,17 @@ class Scanner {
             case ')': addToken(RIGHT_PAREN); break;
             case '{': addToken(LEFT_CURLY); break;
             case '}': addToken(RIGHT_CURLY); break;
-            case '[': addToken(LEFT_BRACE); break;
-            case ']': addToken(RIGHT_BRACE); break;
+            case '[':
+//                addToken(LEFT_BRACE);
+                escape();
+                break;
+//            case ']': addToken(RIGHT_BRACE); break;
             case '+': addToken(PLUS); break;
             case '*': addToken(STAR); break;
             case '/': addToken(SLASH); break;
             case '%': addToken(MODULO); break;
             case ',': addToken(COMMA); break;
-//            case '$': addToken(NEW_LINE); break;
+            case '$': addToken(NEW_LINE, '\n'); break;
             case ':': addToken(COLON); break;
             case '&': addToken(CONCAT); break;
 
@@ -227,6 +230,31 @@ class Scanner {
         addToken(type, value);
     }
 
+    private void escape(){
+        StringBuilder sb = new StringBuilder();
+        while(!isAtEnd()){
+            if(peek() == ']'){
+                //kita natag closing nga ], pero check sa nato
+                //if naay sunod nga ] kay pasabot ana kay mahimong string ang una nga ] (e.g []])
+                if(peekNext() == ']'){
+                    sb.append(peek());
+                    advance();
+                }
+
+                advance();
+
+                String value = sb.toString();
+                addToken(STRING, value);
+                return;
+            }
+
+            sb.append(peek());
+            advance();
+        }
+
+        Bisaya.error(line, "Wala'y panapos nga simbolo ang '['.");
+    }
+
     private void number() {
         while(isDigit(peek())){
             advance();
@@ -256,7 +284,7 @@ class Scanner {
         }
 
         String text = source.substring(start, current);
-        System.out.println("Original string: " + text);
+//        System.out.println("Original string: " + text);
 
         //Check from the reserved keywords if the scanned text is found there
         TokenType type = keywords.get(text);
@@ -281,7 +309,7 @@ class Scanner {
             }
 
             String potentialSecondKeyword = source.substring(tempStart, current);
-            System.out.println("Checking the keywords: " + text + " " + potentialSecondKeyword);
+//            System.out.println("Checking the keywords: " + text + " " + potentialSecondKeyword);
 
             //now concat the two keywords
             TokenType type2 = keywords.get(text + " " + potentialSecondKeyword);

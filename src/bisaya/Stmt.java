@@ -87,6 +87,11 @@ abstract class Stmt {
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitVarStmt(this);
         }
+
+        @Override
+        public String toString(){
+            return name.lexeme;
+        }
     }
 
     public static class MultiVar extends Stmt {
