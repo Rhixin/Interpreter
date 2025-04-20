@@ -110,7 +110,8 @@ class Parser {
         List<Stmt.Var> declarations = new ArrayList<>();
 
         do{
-            //if di na sha assignment
+            // dapat sa for loop naay = jud
+            // dapat naka initialize sha
             if(!checkNext(EQUAL) && isForLoop){
                 break;
             }
@@ -136,8 +137,10 @@ class Parser {
             return forStatement();
         } else if(match(WHILE)){
             return whileStatement();
-        }else if(match(PRINT)){
+        }else if(match(PRINT)) {
             return printStatement();
+        }else if(match(INPUT)){
+            return inputStatement();
         }else if(match(LEFT_CURLY)){
             return new Stmt.Block(block());
         }
@@ -171,6 +174,15 @@ class Parser {
         return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
+    private Stmt inputStatement(){
+        List<Token> names = new ArrayList<>();
+
+        do {
+            names.add(consume(IDENTIFIER, "Nagdahom og ngalan sa sulodanan."));
+        } while (match(COMMA));
+
+        return new Stmt.Input(names);
+    }
     private Stmt forStatement(){
         consume(LEFT_PAREN, "Nagdahom og '(' human sa 'ALANG SA'.");
 

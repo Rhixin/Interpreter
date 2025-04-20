@@ -26,7 +26,7 @@ enum TokenType {
     IDENTIFIER, NUMBER, DOUBLE, CHARACTER, BOOLEAN,
 
     // Keywords.---------------------------------------------------------------------
-    START, END, DECLARE, PRINT, BLOCK, FOR, SCAN, AND, OR, TRUE, NOT, FALSE, IF, ELSE_IF, ELSE, WHILE,
+    START, END, DECLARE, PRINT, BLOCK, FOR, SCAN, AND, OR, TRUE, NOT, FALSE, IF, ELSE_IF, ELSE, WHILE, INPUT,
 
 
     //??------------------------------------------------------------------------------

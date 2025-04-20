@@ -48,6 +48,7 @@ class Scanner {
         keywords.put("DAWAT",  SCAN);
 
         keywords.put("SAMTANG", WHILE);
+        keywords.put("DAWAT", INPUT);
     }
 
     //helpers in scanning
