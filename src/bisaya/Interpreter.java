@@ -182,12 +182,24 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
-        Object value = null;
-        if (stmt.initializer != null) {
-            value = evaluate(stmt.initializer);
-        }
+//        Object value = null;
+//        if (stmt.initializer != null) {
+//            value = evaluate(stmt.initializer);
+//        }
+//
+//        environment.define(stmt.name, value);
+        return null;
+    }
+    @Override
+    public Void visitMultiVarStmt(Stmt.MultiVar stmt) {
+        for (Stmt.Var var : stmt.vars) {
+            Object value = null;
+            if (var.initializer != null) {
+                value = evaluate(var.initializer);
+            }
 
-        environment.define(stmt.name.lexeme, value);
+            environment.define(var.name, stmt.dataType, value);
+        }
         return null;
     }
 
@@ -221,6 +233,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         }
         return null;
     }
+
 
     //HELPER FUNCTIONS----------------------------------------------------------------------------------
     private boolean isTruthy(Object object){

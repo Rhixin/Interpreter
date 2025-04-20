@@ -95,7 +95,8 @@ class Scanner {
             case '/': addToken(SLASH); break;
             case '%': addToken(MODULO); break;
             case ',': addToken(COMMA); break;
-            case '$': addToken(NEW_LINE); break;
+//            case '$': addToken(NEW_LINE); break;
+            case ':': addToken(COLON); break;
             case '&': addToken(CONCAT); break;
 
             //ONE OR MORE CHARACTERS
@@ -185,9 +186,18 @@ class Scanner {
     }
 
     private void string(){
+        StringBuilder sb = new StringBuilder();
+
         while(peek() != '"' && !isAtEnd()){
             if(peek() == '\n'){
                 line++;
+            }
+
+            //for printing purposes
+            if (peek() == '$') {
+                sb.append('\n');
+            } else {
+                sb.append(peek());
             }
 
             advance();
@@ -202,7 +212,8 @@ class Scanner {
         advance();
 
         //Trimming the string excluding the surrounding quotes
-        String value = source.substring(start + 1, current - 1);
+//        String value = source.substring(start + 1, current - 1);
+        String value = sb.toString();
 
         //3 possible tokentypes only for words enclosed by ""
         //STRING, TRUE, FALSE
@@ -256,10 +267,8 @@ class Scanner {
             //now we have to check if naay sumpay pa ang keyword (e.g. KUNG DILI)
             //at this point, naa tas isa ka space - advance()
 
-            if(!isAtEnd()){
+            if(peek() == ' '){ // if space, consume it
                 advance();
-            }else{
-                return;
             }
 
             //check sa nato og valid keyword sad ba ang next token
@@ -279,9 +288,18 @@ class Scanner {
 
             if(type2 == null){ //meaning the second word is not a valid second keyword
                 // we revert the values of the marker variables to their original values
+                System.out.println("Not valid combination");
                 current = preservedCurrValue;
+                if(text.equals("DILI")) { //the not operator
+                    //doble na ang DILI sa map so i catch nlang sa nako diri
+                    //since dili man sad mahitabo nga maabot diri ang DILI nga FALSE
+                    //kay ginatreat man shag string
+                    type = NOT;
+                }
+
                 addToken(type);
             }else{
+                System.out.println("Valid combination");
                 // meaning valid sha
                 addToken(type2);
             }

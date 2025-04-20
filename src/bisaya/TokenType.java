@@ -7,7 +7,7 @@ enum TokenType {
     //+ , /, *, %, =
     PLUS, SLASH, STAR, MODULO, EQUAL,
     //,
-    COMMA,
+    COMMA, COLON,
     //$, &
     NEW_LINE, CONCAT,
 

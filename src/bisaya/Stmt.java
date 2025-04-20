@@ -11,6 +11,7 @@ abstract class Stmt {
         R visitVarStmt(Var stmt);
         R visitForStmt(While stmt);
         R visitWhileStmt(While stmt);
+        R visitMultiVarStmt(MultiVar stmt);
 
     }
 
@@ -85,6 +86,21 @@ abstract class Stmt {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitVarStmt(this);
+        }
+    }
+
+    public static class MultiVar extends Stmt {
+        public final TokenType dataType;
+        public final List<Var> vars;
+
+        public MultiVar(TokenType dataType, List<Var> vars) {
+            this.dataType = dataType;
+            this.vars = vars;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitMultiVarStmt(this);
         }
     }
 

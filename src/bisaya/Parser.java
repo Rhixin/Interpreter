@@ -88,18 +88,39 @@ class Parser {
         }
     }
 
+//    private Stmt varDeclaration() {
+//        System.out.println("In varDeclaration() - current token: " + peek());
+//            // check if a data type is provided
+//        TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
+//        Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
+//
+//        Expr initializer = null;
+//        if (match(EQUAL)) {
+//            initializer = expression();
+//        }
+//
+//        return new Stmt.Var(name, dataType, initializer);
+//    }
+
     private Stmt varDeclaration() {
         System.out.println("In varDeclaration() - current token: " + peek());
-            // check if a data type is provided
-        consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK");
-        Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
+        // check if a data type is provided
+        TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
 
-        Expr initializer = null;
-        if (match(EQUAL)) {
-            initializer = expression();
-        }
+        List<Stmt.Var> declarations = new ArrayList<>();
 
-        return new Stmt.Var(name, initializer);
+        do{
+            Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
+
+            Expr initializer = null;
+            if (match(EQUAL)) {
+                initializer = expression();
+            }
+
+            declarations.add(new Stmt.Var(name, initializer));
+        }while(match(COMMA));
+
+        return new Stmt.MultiVar(dataType, declarations);
     }
 
     private Stmt statement(){
@@ -196,7 +217,7 @@ class Parser {
         Expr condition = expression();
 
         consume(RIGHT_PAREN, "Nagdahom og ')' silbe panapos sa kondisyon sa 'WHILE LOOP'.");
-        consume(BLOCK, "Nagdahom og 'PUNDOK' silbe timaan sa sinugdanan sa usa ka tapok.");
+        consume(BLOCK, ",");
 
         Stmt body = statement();
 
@@ -206,6 +227,7 @@ class Parser {
     }
 
     private Stmt printStatement(){
+        consume(COLON, "Nagdahom og ':' human sa 'IPAKITA'.");
         System.out.println("In printStatement() - current token: " + peek());
         Expr value = expression();
         return new Stmt.Print(value);
