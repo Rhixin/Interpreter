@@ -12,6 +12,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
             for(Stmt statement : statements){
                 execute(statement);
             }
+
+            System.out.println("\n[No Error]");
         } catch (RuntimeError error){
             Bisaya.runtimeError(error);
         }

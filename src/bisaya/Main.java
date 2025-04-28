@@ -12,16 +12,15 @@ public class Main {
         Scanner scScanner = null;
 
         try{
-            source = reader.readSourceCode("src/bisaya/Utils/sample.txt");
+            source = reader.readSourceCode("src/bisaya/Utils/tc14.txt");
         }catch (IOException e){
             e.printStackTrace();
         }
 
         scScanner = new Scanner(source);
 
-
         Parser parser = new Parser(scScanner.scanTokens());
-        scScanner.printTokens();
+//        scScanner.printTokens();
 
 //        Expr expression = parser.parse();
         List<Stmt> statements = parser.parse();

@@ -75,7 +75,7 @@ class Parser {
 
     // ADDED GRAMMAR FOR STATEMENTS
     private Stmt declaration(){
-        System.out.println("In declaration() - current token: " + peek());
+        //System.out.println("In declaration() - current token: " + peek());
         try{
             if(match(DECLARE)){
                 return varDeclaration(false);
@@ -89,7 +89,7 @@ class Parser {
     }
 
     private Stmt varDeclarationSingle() {
-        System.out.println("In varDeclaration() - current token: " + peek());
+        //System.out.println("In varDeclaration() - current token: " + peek());
             // check if a data type is provided
         TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
         Token name = consume(IDENTIFIER, "Nagdahom og pangalan sa sulodanan.");
@@ -103,7 +103,7 @@ class Parser {
     }
 
     private Stmt varDeclaration(boolean isForLoop) {
-        System.out.println("In varDeclaration() - current token: " + peek());
+        //System.out.println("In varDeclaration() - current token: " + peek());
         // check if a data type is provided
         TokenType dataType = consumeDataType("Gilauman nga klase sa sulodanan: NUMERO, LETRA, TINUOD, TIPIK").type;
 
@@ -130,7 +130,7 @@ class Parser {
     }
 
     private Stmt statement(){
-        System.out.println("In statement() - current token: " + peek());
+        //System.out.println("In statement() - current token: " + peek());
         if(match(IF, ELSE_IF)) {
             return ifStatement();
         }else if(match(FOR)){
@@ -249,13 +249,13 @@ class Parser {
 
     private Stmt printStatement(){
         consume(COLON, "Nagdahom og ':' human sa 'IPAKITA'.");
-        System.out.println("In printStatement() - current token: " + peek());
+        //System.out.println("In printStatement() - current token: " + peek());
         Expr value = expression();
         return new Stmt.Print(value);
     }
 
     private Stmt expressionStatement(){
-        System.out.println("In expressionStatement() - current token: " + peek());
+        //System.out.println("In expressionStatement() - current token: " + peek());
         Expr expr = expression();
         return new Stmt.Expression(expr);
     }
@@ -276,7 +276,7 @@ class Parser {
     //TODO: IMPLEMENT CONCAT
 
     private Expr expression(){
-        System.out.println("In expression() - current token: " + peek());
+        //System.out.println("In expression() - current token: " + peek());
 //        return or();
         return assignment();
     }
@@ -312,7 +312,7 @@ class Parser {
 
 
     private Expr or(){
-        System.out.println("In or() - current token: " + peek());
+        //System.out.println("In or() - current token: " + peek());
         Expr expr = and();
 
         while(match(OR)){
@@ -325,7 +325,7 @@ class Parser {
     }
 
     private Expr and(){
-        System.out.println("In and() - current token: " + peek());
+        //System.out.println("In and() - current token: " + peek());
         Expr expr = equality();
 
         while(match(AND)){
@@ -338,7 +338,7 @@ class Parser {
     }
 
     private Expr equality(){
-        System.out.println("In equality() - current token: " + peek());
+        //System.out.println("In equality() - current token: " + peek());
         Expr expr = comparison();
 
         while(match(NOT_EQUAL, EQUAL_EQUAL)){
@@ -351,7 +351,7 @@ class Parser {
     }
 
     private Expr comparison(){
-        System.out.println("In comparison() - current token: " + peek());
+        //System.out.println("In comparison() - current token: " + peek());
         Expr expr = term();
 
         while(match(GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL)){
@@ -364,7 +364,7 @@ class Parser {
     }
 
     private Expr term(){
-        System.out.println("In term() - current token: " + peek());
+        //System.out.println("In term() - current token: " + peek());
         Expr expr = factor();
 
         while(match(MINUS, PLUS, MODULO)){
@@ -377,7 +377,7 @@ class Parser {
     }
 
     private Expr factor() {
-        System.out.println("In factor() - current token: " + peek());
+        //System.out.println("In factor() - current token: " + peek());
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
@@ -390,7 +390,7 @@ class Parser {
     }
 
     private Expr unary() {
-        System.out.println("In unary() - current token: " + peek());
+        //System.out.println("In unary() - current token: " + peek());
         if (match(NOT, MINUS)) {
             Token operator = previous();
             Expr right = unary();
@@ -413,7 +413,7 @@ class Parser {
     }
 
     private Expr primary() {
-        System.out.println("In primary() - current token: " + peek());
+        //System.out.println("In primary() - current token: " + peek());
         if (match(FALSE)) {
             return new Expr.Literal(false);
         } else if (match(TRUE)) {

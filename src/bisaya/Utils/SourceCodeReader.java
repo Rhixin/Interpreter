@@ -18,7 +18,7 @@ public class SourceCodeReader {
     public String readSourceCode(String path) throws IOException {
         Path filePath = Path.of(path);
         if (Files.exists(filePath)) {
-            System.out.println("File exists: " + filePath.toAbsolutePath());
+            //System.out.println("File exists: " + filePath.toAbsolutePath());
         } else {
             System.out.println("File not found: " + filePath.toAbsolutePath());
         }

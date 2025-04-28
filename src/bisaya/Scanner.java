@@ -319,7 +319,7 @@ class Scanner {
 
             if(type2 == null){ //meaning the second word is not a valid second keyword
                 // we revert the values of the marker variables to their original values
-                System.out.println("Not valid combination");
+                //System.out.println("Not valid combination");
                 current = preservedCurrValue;
                 if(text.equals("DILI")) { //the not operator
                     //doble na ang DILI sa map so i catch nlang sa nako diri
@@ -330,7 +330,7 @@ class Scanner {
 
                 addToken(type);
             }else{
-                System.out.println("Valid combination");
+                //System.out.println("Valid combination");
                 // meaning valid sha
                 addToken(type2);
             }

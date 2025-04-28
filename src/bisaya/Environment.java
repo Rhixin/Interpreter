@@ -18,9 +18,9 @@ public class Environment {
 
     void define(Token name, TokenType dataType, Object value) {
         TokenType givenType = getTokenTypeFromValue(value);
-        if(givenType != dataType && value != null){
-            throw new RuntimeError(name, String.format("Ang gihatag nga bili '%s' sa sulodanan nga '%s' wala magtugma sa iyang klase sa datos '%s'.", value, name.lexeme, dataType));
-        }
+//        if(givenType != dataType && value != null){
+//            throw new RuntimeError(name, String.format("Ang gihatag nga bili '%s' sa sulodanan nga '%s' wala magtugma sa iyang klase sa datos '%s'.", value, name.lexeme, dataType));
+//        }
 
         values.put(name.lexeme, value);
 //        TokenType type = getTokenTypeFromValue(value)

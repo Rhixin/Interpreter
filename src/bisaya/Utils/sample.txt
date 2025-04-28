@@ -20,3 +20,5 @@ SUGOD
         IPAKITA: "equal ra silaa"
     }
 KATAPUSAN
+
+
