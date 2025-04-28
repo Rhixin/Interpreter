@@ -12,7 +12,7 @@ public class Main {
         Scanner scScanner = null;
 
         try{
-            source = reader.readSourceCode("src/bisaya/Utils/tc14.txt");
+            source = reader.readSourceCode("src/bisaya/Utils/tc15.txt");
         }catch (IOException e){
             e.printStackTrace();
         }
