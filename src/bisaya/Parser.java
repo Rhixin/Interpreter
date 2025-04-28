@@ -175,6 +175,7 @@ class Parser {
     }
 
     private Stmt inputStatement(){
+        consume(COLON, "Nagdahom og ':' human sa 'DAWAT'.");
         List<Token> names = new ArrayList<>();
 
         do {
