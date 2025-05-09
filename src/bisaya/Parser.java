@@ -175,22 +175,17 @@ class Parser {
     }
 
     private Stmt inputStatement(){
-        try{
-            consume(COLON, "Nagdahom og ':' human sa 'DAWAT'.");
+        consume(COLON, "Nagdahom og ':' human sa 'DAWAT'.");
 
-            List<Token> names = new ArrayList<>();
+        List<Token> names = new ArrayList<>();
 
-            do {
-                names.add(consume(IDENTIFIER, "Nagdahom og ngalan sa sulodanan."));
-            } while (match(COMMA));
+        do {
+            names.add(consume(IDENTIFIER, "Nagdahom og ngalan sa sulodanan."));
+        } while (match(COMMA));
 
-            return new Stmt.Input(names);
-        }catch (ParseError err){
-            System.exit(1);
-        }
-
-        return null;
+        return new Stmt.Input(names);
     }
+
     private Stmt forStatement(){
         consume(LEFT_PAREN, "Nagdahom og '(' human sa 'ALANG SA'.");
 

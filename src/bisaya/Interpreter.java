@@ -210,14 +210,26 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
         if (parts.length != stmt.names.size()) {
             throw new RuntimeError(stmt.names.get(0), "Gilauman ang " + stmt.names.size() + " ka bili, pero nakuha ang " + parts.length + ".");
         }
+//
+//        for(int i = 0;  i < stmt.names.size(); i++){
+//            System.out.println(stmt.names.get(i));
+//        }
 
         for (int i = 0; i < stmt.names.size(); i++) {
             Token name = stmt.names.get(i);
+
             String raw = parts[i].trim();
             TokenType expectedType = environment.getType(name.lexeme);
 
             Object value = parseInput(raw, expectedType, name);
+
+            System.out.println("THE VALUE IS: " + value);
+
+
             environment.assign(name, value);
+
+//            System.out.println("Name: " + name);
+//            System.out.println("Value: " + environment.get(name));
         }
 
         return null;
@@ -342,6 +354,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     private String stringify(Object object) {
         if (object == null) return "null";
 
+        System.out.println(object);
+
         if (object instanceof Boolean) {
             return (Boolean) object ? "OO" : "DILI";
         }
@@ -362,6 +376,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     }
 
     private Object parseInput(String raw, TokenType expectedType, Token name) {
+
         try {
             switch (expectedType) {
                 case NUMBER:
@@ -369,7 +384,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
                 case DOUBLE:
                     return Double.parseDouble(raw);
                 case BOOLEAN:
-                    return Boolean.parseBoolean(raw);
+                    if(raw.equals("\"OO\"")){
+                        return true;
+                    }else{
+                        return false;
+                    }
                 case CHARACTER:
                     if (raw.length() != 1) throw new RuntimeException();
                     return raw.charAt(0);
